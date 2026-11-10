@@ -1,0 +1,84 @@
+[README.md](https://github.com/user-attachments/files/34631179/README.md)
+
+# A2 English Assessment (free, offline, single file)
+
+A free listening, speaking, reading and writing test for school computer labs.
+Built as a gift for a non-profit school. No server, no account, no subscription, no paid service.
+Download one file (`index.html`), open it in Chrome or Edge, and run the test.
+
+| Student home | Speaking | Student dashboard |
+|---|---|---|
+| ![Student home](docs/screenshots/02-student-home.png) | ![Speaking](docs/screenshots/04-speaking.png) | ![Dashboard](docs/screenshots/03-student-dashboard.png) |
+
+| Teacher home | Class dashboard |
+|---|---|
+| ![Teacher home](docs/screenshots/05-teacher-home.png) | ![Class dashboard](docs/screenshots/06-teacher-dashboard.png) |
+
+## What it does
+
+**For students**
+- Log in with name, class and roll number, then press the test icon. A popup warns that the test is timed.
+- Listening (clips are read aloud by the browser, 2 plays each), speaking (real microphone recording), reading and writing (typed).
+- Speaking: one question at a time, a 12 second "get ready" gap, then recording starts by itself.
+- Each speaking answer gets an automatic mark out of 1: **0** if not relevant, **0.5** for one relevant complete sentence, **1** for more than one.
+- Dashboard (scores, progress, class average, tips) and Results, shown only after the teacher releases them.
+
+**For teachers**
+- Class dashboard, marking queue with comment phrases, question analysis (which questions were hardest), student list, release by class or student, printable report cards.
+- Replace all the questions by uploading a CSV (see [docs/question-format.md](docs/question-format.md)).
+- Filters by date and class on every screen.
+
+## Quick start
+
+1. Download `index.html` (or clone this repository).
+2. Open it in **Chrome or Edge**.
+3. Change the teacher password (see below), then try one full test with a headset.
+
+### Running it for a whole lab
+
+Open `index.html` on one computer, or put it on GitHub Pages (Settings, Pages, deploy from the `main` branch). Pages uses `https://`, which browsers need before they allow the microphone.
+
+> **Important:** results are stored inside the browser on the computer where each test was taken. Different computers do not share results. Either run all tests on one computer (students take turns), or export the CSV from each computer after the session.
+
+## Settings you should change
+
+Open `index.html` in a text editor and search for these near the top of the `<script>`:
+
+| Setting | Meaning |
+|---|---|
+| `TEACHER_PASSWORD` | **Change this.** Default is `admin123`. Anyone who views the page source can read it, so it only keeps students out of the teacher screens by habit, it is not strong security. |
+| `TIMER_CONFIG` | Minutes per section (in seconds). |
+| `SPEAKING_PREP_SECONDS` | Thinking gap before each speaking question (10 to 15 works well). |
+| `SPEAKING_MAX_SECONDS` | Longest speaking answer. |
+| `MAX_LISTEN_PLAYS` | How many times a listening clip can be played. |
+| `WRITING_MAX_MARKS` | Marks you can give for each writing prompt. |
+
+School name and logo: search for `School Name (tbc)` and `Logo<br>(tbc)` and replace them (use an `<img>` tag for the logo).
+
+## Changing the questions
+
+Teacher portal, then Question Bank: download the CSV, edit it in Excel or Google Sheets, save as CSV and upload it. Full rules are in [docs/question-format.md](docs/question-format.md). You can also use AI to draft questions, see [docs/using-ai.md](docs/using-ai.md).
+
+## Privacy and limits (please read)
+
+- **Student data stays on the computer.** Names, answers, marks and audio recordings are saved in the browser (localStorage and IndexedDB). Nothing is uploaded by this app. Clearing the browser's site data deletes everything, so export CSVs regularly.
+- **Speech-to-text is done by the browser, not this app.** In Chrome and Edge the browser sends the audio to the browser vendor's speech service to get text. It needs internet. If your school policy or parents' consent does not allow that, the recordings are still saved, but you would need to mark speaking by listening. Check your school's rules before using it with children.
+- **Automatic speaking marks are a first pass.** They use a free keyword and length check, not AI. They can be wrong. Check them in the Marking screen and override any mark.
+- **Not tested with a real microphone in every setup.** Do a trial with a headset first.
+- Speech recognition and microphone use work best in Chrome or Edge on Windows, Mac or Chromebook.
+
+## Project files
+
+```
+index.html                  the whole app (HTML, CSS and JavaScript)
+samples/A2_Question_Bank.csv  the built-in questions as an editable CSV
+docs/                       question format, AI guide, screenshots
+```
+
+## Contributing
+
+Ideas and fixes are welcome. Open an issue or a pull request. Please keep the app a single file with no external dependencies so schools can use it offline.
+
+## License
+
+MIT. Free to use, copy, change and share. See [LICENSE](LICENSE).
