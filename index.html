@@ -1,0 +1,2492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>A2 CEFR Automated Language Assessment Platform</title>
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --border: #cbd5e1;
+      --success: #16a34a;
+      --warning: #d97706;
+      --danger: #dc2626;
+      --teacher-primary: #0284c7;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 950px;
+      background: var(--card-bg);
+      border-radius: 12px;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+      padding: 32px;
+      border: 1px solid var(--border);
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 2px solid var(--border);
+    }
+
+    .title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    .timer {
+      font-weight: 700;
+      font-size: 1.1rem;
+      background: #fee2e2;
+      color: var(--danger);
+      padding: 6px 12px;
+      border-radius: 6px;
+    }
+
+    .student-badge {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .nav-tabs {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .tab-btn {
+      padding: 8px 16px;
+      background: #e2e8f0;
+      border: none;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .tab-btn.active {
+      background: var(--primary);
+      color: white;
+    }
+
+    .section {
+      display: none;
+    }
+
+    .section.active {
+      display: block;
+    }
+
+    h2 {
+      margin-bottom: 16px;
+      font-size: 1.4rem;
+      color: #1e293b;
+    }
+
+    p {
+      margin-bottom: 12px;
+      line-height: 1.5;
+      color: #334155;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 600;
+    }
+
+    .form-group input, .form-group select {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 1rem;
+    }
+
+    .question-block {
+      margin-bottom: 18px;
+      padding: 16px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background-color: #fafafa;
+    }
+
+    .question-title {
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    label.option-label {
+      display: block;
+      margin: 6px 0;
+      cursor: pointer;
+      font-weight: normal;
+    }
+
+    input[type="radio"] {
+      margin-right: 8px;
+    }
+
+    textarea {
+      width: 100%;
+      height: 110px;
+      padding: 10px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      resize: vertical;
+      font-size: 0.95rem;
+      line-height: 1.4;
+      margin-top: 8px;
+    }
+
+    textarea:read-only {
+      background-color: #f1f5f9;
+      color: #475569;
+      cursor: not-allowed;
+      border-color: #cbd5e1;
+    }
+
+    .btn {
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 6px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s ease;
+      margin-top: 12px;
+    }
+
+    .btn:hover {
+      background-color: var(--primary-hover);
+    }
+
+    .btn-teacher {
+      background-color: var(--teacher-primary);
+    }
+
+    .btn:disabled {
+      background-color: #94a3b8;
+      cursor: not-allowed;
+    }
+
+    .card-box {
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      border-radius: 8px;
+      padding: 20px;
+      margin-top: 16px;
+    }
+
+    .score-badge {
+      display: inline-block;
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: var(--primary);
+      margin-bottom: 8px;
+    }
+
+    .report-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 16px;
+    }
+
+    .report-table th, .report-table td {
+      border: 1px solid var(--border);
+      padding: 10px;
+      text-align: left;
+      font-size: 0.9rem;
+    }
+
+    .report-table th {
+      background-color: #f1f5f9;
+    }
+
+    .badge-locked {
+      display: inline-block;
+      background: #fef2f2;
+      color: #991b1b;
+      font-size: 0.8rem;
+      font-weight: bold;
+      padding: 3px 6px;
+      border-radius: 4px;
+      border: 1px solid #fecaca;
+      margin-top: 4px;
+    }
+
+    .realtime-feedback {
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-top: 6px;
+      display: none;
+    }
+
+    .realtime-feedback.correct { color: var(--success); }
+    .realtime-feedback.incorrect { color: var(--danger); }
+
+    .chart-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 20px 0;
+    }
+
+    .img-illustration {
+      margin: 8px 0;
+      padding: 8px;
+      background: #f1f5f9;
+      border-radius: 6px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    audio {
+      width: 100%;
+      margin-top: 8px;
+    }
+
+    /* --- added: speaking flow, AI notes --- */
+    .spk-count { font-size: 3.5rem; font-weight: 800; color: var(--primary); margin: 6px 0 12px; }
+    .rec-live { color: var(--danger); font-weight: 700; font-size: 1.1rem; margin: 8px 0; }
+    .ai-box { background: #f0f9ff; border-radius: 6px; padding: 8px 10px; margin: 8px 0; font-size: 0.85rem; }
+    .realtime-feedback.saved { color: var(--text-muted); }
+    .btn-grey { background-color: #64748b; }
+    .small-note { font-size: 0.8rem; color: var(--text-muted); }
+
+    /* ===== New look ===== */
+    :root { --primary: #4f46e5; --primary-hover: #4338ca; --teacher-primary: #0891b2; --bg: #eef2ff; --border: #e2e8f0; }
+    * { font-family: "Inter", "Segoe UI", system-ui, -apple-system, Roboto, Arial, sans-serif; }
+    body { background: linear-gradient(160deg, #eef2ff 0%, #f0f9ff 55%, #fdf4ff 100%); align-items: flex-start; }
+    .container { border: none; border-radius: 20px; padding: 0 0 28px; overflow: hidden; box-shadow: 0 20px 50px -12px rgba(79, 70, 229, 0.25); margin-top: 10px; }
+    .container > * { margin-left: 32px; margin-right: 32px; }
+    .container > .header:first-of-type, .container > .nav-tabs { }
+    .nav-tabs { margin-top: 24px; background: #f1f5f9; padding: 5px; border-radius: 12px; width: fit-content; }
+    .tab-btn { background: transparent; color: #475569; padding: 9px 18px; border-radius: 9px; transition: all .2s ease; }
+    .tab-btn:hover { color: var(--primary); }
+    .tab-btn.active { background: #fff; color: var(--primary); box-shadow: 0 2px 8px rgba(15, 23, 42, .12); }
+    .header { margin-top: 0; margin-bottom: 26px; padding: 18px 20px; border: none; border-radius: 14px; background: linear-gradient(120deg, #4f46e5, #7c3aed); }
+    .title { color: #fff; font-size: 1.3rem; letter-spacing: .2px; }
+    .student-badge { color: rgba(255, 255, 255, .85); }
+    .timer { background: rgba(255, 255, 255, .95); color: var(--danger); border-radius: 999px; padding: 7px 16px; font-variant-numeric: tabular-nums; box-shadow: 0 2px 8px rgba(0, 0, 0, .15); }
+    h2 { font-size: 1.5rem; color: #1e1b4b; margin-bottom: 10px; }
+    h3 { color: #312e81; margin: 6px 0 10px; }
+    .form-group input, .form-group select, textarea { border: 1.5px solid var(--border); border-radius: 10px; padding: 11px 12px; background: #fff; transition: border-color .2s, box-shadow .2s; }
+    .form-group input:focus, .form-group select:focus, textarea:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 4px rgba(79, 70, 229, .15); }
+    .question-block { background: #fff; border: 1px solid var(--border); border-radius: 14px; padding: 18px 20px; box-shadow: 0 2px 10px rgba(15, 23, 42, .05); }
+    .question-title { color: #1e1b4b; }
+    label.option-label { padding: 10px 14px; border: 1.5px solid var(--border); border-radius: 10px; margin: 8px 0; transition: all .15s ease; background: #fff; }
+    label.option-label:hover { border-color: #a5b4fc; background: #f5f3ff; }
+    label.option-label:has(input:checked) { border-color: var(--primary); background: #eef2ff; font-weight: 600; }
+    .btn { border-radius: 10px; padding: 11px 22px; background: linear-gradient(120deg, #4f46e5, #6366f1); box-shadow: 0 4px 12px rgba(79, 70, 229, .3); transition: transform .15s ease, box-shadow .15s ease; }
+    .btn:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(79, 70, 229, .38); background: linear-gradient(120deg, #4338ca, #4f46e5); }
+    .btn:disabled { background: #cbd5e1; box-shadow: none; transform: none; }
+    .btn-teacher { background: linear-gradient(120deg, #0891b2, #06b6d4); box-shadow: 0 4px 12px rgba(8, 145, 178, .3); }
+    .btn-teacher:hover { background: linear-gradient(120deg, #0e7490, #0891b2); }
+    .btn-grey { background: #64748b; box-shadow: none; }
+    .btn-grey:hover { background: #475569; box-shadow: none; }
+    .card-box { background: linear-gradient(135deg, #eef2ff, #f5f3ff); border: 1px solid #c7d2fe; border-radius: 14px; }
+    .score-badge { color: #4338ca; font-size: 1.35rem; }
+    .report-table { border-radius: 12px; overflow: hidden; border-collapse: separate; border-spacing: 0; border: 1px solid var(--border); }
+    .report-table th, .report-table td { border: none; border-bottom: 1px solid var(--border); }
+    .report-table th { background: #eef2ff; color: #3730a3; }
+    .report-table tr:last-child td { border-bottom: none; }
+    .img-illustration { background: linear-gradient(135deg, #f1f5f9, #eef2ff); border-radius: 12px; }
+    .spk-count { background: linear-gradient(120deg, #4f46e5, #7c3aed); -webkit-background-clip: text; background-clip: text; color: transparent; font-size: 4.5rem; }
+    .rec-live { animation: pulse 1.1s ease-in-out infinite; }
+    @keyframes pulse { 50% { opacity: .45; } }
+    .ai-box { background: #f5f3ff; border: 1px solid #ddd6fe; border-radius: 10px; }
+    .realtime-feedback.saved { color: var(--success); }
+    @media (max-width: 640px) { .container > * { margin-left: 16px; margin-right: 16px; } .header { flex-direction: column; align-items: flex-start; gap: 8px; } }
+
+    .brand-logo { width: 64px; height: 64px; flex-shrink: 0; border: 2px dashed rgba(255,255,255,.7); border-radius: 12px; color: #fff; font-size: .7rem; font-weight: 600; display: flex; align-items: center; justify-content: center; text-align: center; line-height: 1.3; background: rgba(255,255,255,.12); }
+    .school-name { color: #fff; font-size: 1.2rem; font-weight: 700; letter-spacing: .6px; text-transform: uppercase; margin-bottom: 2px; }
+    .header > .timer { margin-left: 12px; }
+
+    .test-icon-btn { display: inline-flex; flex-direction: column; align-items: center; gap: 12px; margin-top: 18px; padding: 28px 44px; border: none; border-radius: 22px; cursor: pointer; color: #fff; font-size: 1.1rem; font-weight: 700; background: linear-gradient(135deg, #4f46e5, #7c3aed); box-shadow: 0 14px 30px -8px rgba(79, 70, 229, .55); transition: transform .15s ease, box-shadow .15s ease; }
+    .test-icon-btn:hover { transform: translateY(-3px) scale(1.03); box-shadow: 0 18px 36px -8px rgba(79, 70, 229, .65); }
+    .modal-back { position: fixed; inset: 0; background: rgba(15, 23, 42, .55); display: none; align-items: center; justify-content: center; z-index: 50; padding: 20px; }
+    .modal-back.open { display: flex; }
+    .modal-box { background: #fff; border-radius: 18px; padding: 28px; max-width: 460px; width: 100%; box-shadow: 0 25px 60px rgba(0, 0, 0, .35); text-align: center; }
+    .modal-box h3 { font-size: 1.3rem; margin-bottom: 8px; }
+    .modal-box ul { text-align: left; margin: 10px 0 14px 22px; color: #334155; line-height: 1.7; }
+
+    .icon-row { display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; }
+    .test-icon-btn.icon-dash { background: linear-gradient(135deg, #0891b2, #06b6d4); box-shadow: 0 14px 30px -8px rgba(8, 145, 178, .55); }
+    .test-icon-btn.icon-res { background: linear-gradient(135deg, #d97706, #f59e0b); box-shadow: 0 14px 30px -8px rgba(217, 119, 6, .55); }
+    .test-icon-btn:disabled { filter: grayscale(.8); opacity: .6; cursor: not-allowed; transform: none; }
+    .dash-ring { width: 120px; height: 120px; border-radius: 50%; background: conic-gradient(#4f46e5 0 100%, #e2e8f0 0); display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; }
+    .dash-ring::before { content: ""; position: absolute; inset: 10px; background: #fff; border-radius: 50%; }
+    .dash-ring span, .dash-ring small { position: relative; }
+    .dash-ring span { font-size: 1.8rem; font-weight: 800; color: #4338ca; }
+    .dash-ring small { color: var(--text-muted); font-size: .75rem; }
+    .dash-track { position: relative; height: 14px; background: #e2e8f0; border-radius: 999px; margin-top: 4px; }
+    .dash-fill { height: 100%; border-radius: 999px; background: linear-gradient(90deg, #4f46e5, #7c3aed); }
+    .dash-avg { position: absolute; top: -3px; width: 3px; height: 20px; background: #0f172a; border-radius: 2px; }
+    .dash-trend { display: flex; gap: 18px; align-items: flex-end; height: 150px; padding: 8px 4px; }
+    .dash-col { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; font-size: .8rem; gap: 2px; }
+    .dash-colbar { width: 34px; border-radius: 8px 8px 0 0; background: linear-gradient(180deg, #7c3aed, #4f46e5); }
+
+    .t-ico { width: 190px; padding: 22px 16px; font-size: 1rem; }
+    .ti-1 { background: linear-gradient(135deg, #4f46e5, #7c3aed); }
+    .ti-2 { background: linear-gradient(135deg, #0891b2, #06b6d4); box-shadow: 0 14px 30px -8px rgba(8, 145, 178, .55); }
+    .ti-3 { background: linear-gradient(135deg, #db2777, #f472b6); box-shadow: 0 14px 30px -8px rgba(219, 39, 119, .5); }
+    .ti-4 { background: linear-gradient(135deg, #059669, #34d399); box-shadow: 0 14px 30px -8px rgba(5, 150, 105, .5); }
+    .ti-5 { background: linear-gradient(135deg, #d97706, #f59e0b); box-shadow: 0 14px 30px -8px rgba(217, 119, 6, .55); }
+    .ti-6 { background: linear-gradient(135deg, #475569, #64748b); box-shadow: 0 14px 30px -8px rgba(71, 85, 105, .5); }
+    .t-badge { position: absolute; top: -8px; right: -8px; min-width: 28px; height: 28px; line-height: 28px; border-radius: 999px; background: #dc2626; color: #fff; font-size: .85rem; font-weight: 800; box-shadow: 0 2px 8px rgba(0,0,0,.3); }
+    .kpi-row { display: flex; flex-wrap: wrap; gap: 12px; }
+    .kpi { flex: 1; min-width: 140px; background: linear-gradient(135deg, #eef2ff, #f5f3ff); border: 1px solid #c7d2fe; border-radius: 14px; padding: 14px 16px; display: flex; flex-direction: column; }
+    .kpi b { font-size: 1.8rem; color: #4338ca; }
+    .kpi span { font-size: .8rem; color: var(--text-muted); font-weight: 600; }
+    .kpi-warn { background: #fffbeb; border-color: #fde68a; }
+    .kpi-warn b { color: #b45309; }
+    .pill { display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: .8rem; font-weight: 700; }
+    .pill.good { background: #dcfce7; color: #166534; }
+    .pill.mid { background: #fef3c7; color: #92400e; }
+    .pill.low { background: #fee2e2; color: #991b1b; }
+    .chip { border: 1px solid #c7d2fe; background: #eef2ff; color: #3730a3; border-radius: 999px; padding: 4px 12px; font-size: .8rem; font-weight: 600; cursor: pointer; margin: 0 6px 6px 0; }
+    .chip:hover { background: #e0e7ff; }
+    #print-area { display: none; }
+    @media print {
+      body { display: block; background: #fff; padding: 0; }
+      .container, .modal-back { display: none !important; }
+      #print-area { display: block; }
+      .print-card { page-break-after: always; padding: 10px 6px; font-size: 12px; color: #000; }
+      .print-card:last-child { page-break-after: auto; }
+      .print-card h1 { font-size: 20px; margin-bottom: 2px; }
+      .print-card h2 { font-size: 15px; margin-bottom: 10px; }
+      .print-card h3 { font-size: 13px; margin: 12px 0 4px; }
+      .print-card table { width: 100%; border-collapse: collapse; margin-bottom: 6px; }
+      .print-card th, .print-card td { border: 1px solid #555; padding: 4px 6px; text-align: left; vertical-align: top; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <!-- Mode Selection Tabs -->
+  <div class="nav-tabs" id="mode-tabs">
+    <button class="tab-btn active" id="tab-student" onclick="switchMode('student')">Student Portal (A2 Level)</button>
+    <button class="tab-btn" id="tab-teacher" onclick="switchMode('teacher')">Teacher Review Portal</button>
+  </div>
+
+  <div class="header">
+    <div class="brand-logo" id="school-logo">Logo<br>(tbc)</div>
+    <div style="flex: 1; margin-left: 16px;">
+      <div class="school-name" id="school-name">School Name (tbc)</div>
+      <div class="title" id="module-title">A2 CEFR Assessment Platform</div>
+      <div class="student-badge" id="student-info-display">Please Login to Begin</div>
+    </div>
+    <div class="timer" id="timer-display" style="display: none;">05:00</div>
+  </div>
+
+  <!-- STUDENT LOGIN -->
+  <div id="sec-student-login" class="section active">
+    <h2>Student Login (CEFR A2 Level)</h2>
+    <p>Enter your details to start the assessment:<br><span id="intro-counts"></span></p>
+    <form autocomplete="off" onsubmit="event.preventDefault(); startStudentSession();">
+      <div class="form-group">
+        <label for="student-name">Full Name</label>
+        <input type="text" id="student-name" name="field_a1" required placeholder="e.g. Abin Johnson" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true">
+      </div>
+      <div class="form-group">
+        <label for="student-class">Class / Section</label>
+        <input type="text" id="student-class" name="field_a2" required placeholder="e.g. Class 8-B" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true">
+      </div>
+      <div class="form-group">
+        <label for="student-roll">Roll Number</label>
+        <input type="text" id="student-roll" name="field_a3" required placeholder="e.g. 8021" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true">
+      </div>
+      <button type="submit" class="btn">Start Assessment</button>
+      <button type="button" class="btn btn-grey" style="margin-left: 8px;" onclick="viewMyResults()">View my results</button>
+    </form>
+  </div>
+
+  <!-- READY SCREEN (after login) -->
+  <div id="sec-ready" class="section" style="text-align: center;">
+    <h2 id="ready-hello">Welcome</h2>
+    <p>You are logged in. Choose an option below.</p>
+    <div class="icon-row">
+      <button type="button" class="test-icon-btn" id="test-icon-btn" onclick="openStartConfirm()" aria-label="Open test">
+        <svg viewBox="0 0 64 64" width="72" height="72" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <rect x="13" y="8" width="38" height="48" rx="6"></rect>
+          <path d="M23 8v-2h18v2"></path>
+          <path d="M22 24h20M22 34h20M22 44h11"></path>
+          <circle cx="46" cy="46" r="9" fill="#fff"></circle>
+          <path d="M46 41v5l3 2"></path>
+        </svg>
+        <span id="test-icon-label">A2 English Test</span>
+      </button>
+      <button type="button" class="test-icon-btn icon-dash" onclick="openDashboard()" aria-label="Open dashboard">
+        <svg viewBox="0 0 64 64" width="72" height="72" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M10 54V10"></path><path d="M10 54h46"></path>
+          <rect x="18" y="32" width="8" height="16" rx="2"></rect>
+          <rect x="31" y="22" width="8" height="26" rx="2"></rect>
+          <rect x="44" y="14" width="8" height="34" rx="2"></rect>
+        </svg>
+        <span>Dashboard</span>
+      </button>
+      <button type="button" class="test-icon-btn icon-res" onclick="openResults()" aria-label="Open results">
+        <svg viewBox="0 0 64 64" width="72" height="72" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M20 10h24v14a12 12 0 0 1-24 0z"></path>
+          <path d="M20 14h-8v4a8 8 0 0 0 8 8M44 14h8v4a8 8 0 0 1-8 8"></path>
+          <path d="M32 36v10M22 54h20M26 46h12"></path>
+        </svg>
+        <span>Results</span>
+      </button>
+    </div>
+    <p id="ready-msg" class="small-note" style="margin-top: 14px; font-weight: 600;"></p>
+  </div>
+
+  <!-- STUDENT DASHBOARD -->
+  <div id="sec-dashboard" class="section">
+    <h2>My Dashboard</h2>
+    <div id="dashboard-content"></div>
+    <button class="btn btn-grey" onclick="backToReady()">Back</button>
+  </div>
+
+  <!-- 1. LISTENING SECTION (10 Qs - 5 min) -->
+  <div id="sec-listening" class="section">
+    <h2 id="h-lis">1. Listening Test</h2>
+    <p>Listen to the spoken audio recordings and choose the correct answer for each item.</p>
+    <div id="listening-container"></div>
+    <button class="btn" onclick="submitListeningSection()">Submit Listening Section</button>
+  </div>
+
+  <!-- LISTENING PERFORMANCE CARD -->
+  <div id="card-listening" class="section">
+    <h2>Listening Performance Card</h2>
+    <div class="card-box">
+      <div class="score-badge" id="listening-score-text">Score: --</div>
+      <p id="listening-feedback-text">Feedback: Loading...</p>
+    </div>
+    <button class="btn" onclick="startSpeakingSection()">Proceed to Speaking Section</button>
+  </div>
+
+  <!-- 2. SPEAKING SECTION (10 Prompts - 10 min) -->
+  <div id="sec-speaking" class="section">
+    <h2 id="h-spk">2. Speaking Test</h2>
+    <p>For each question you get <span id="spk-prep-label">12</span> seconds to think. Recording then starts by itself. Answer in full sentences: one relevant sentence earns half marks and more than one earns full marks. Press Stop when you have finished.</p>
+    <div id="speaking-container"></div>
+  </div>
+
+  <!-- SPEAKING PERFORMANCE CARD -->
+  <div id="card-speaking" class="section">
+    <h2>Speaking Performance Card</h2>
+    <div class="card-box">
+      <div class="score-badge" id="speaking-score-text">Status: Complete</div>
+      <p id="speaking-feedback-text">Feedback: Loading...</p>
+    </div>
+    <button class="btn" onclick="startReadingSection()">Proceed to Reading Section</button>
+  </div>
+
+  <!-- 3. READING SECTION (10 Qs - 5 min) -->
+  <div id="sec-reading" class="section">
+    <h2 id="h-read">3. Reading Test</h2>
+    <p>Read the passages carefully and answer the comprehension questions.</p>
+    <div id="reading-container"></div>
+    <button class="btn" onclick="submitReadingSection()">Submit Reading Section</button>
+  </div>
+
+  <!-- READING PERFORMANCE CARD -->
+  <div id="card-reading" class="section">
+    <h2>Reading Performance Card</h2>
+    <div class="card-box">
+      <div class="score-badge" id="reading-score-text">Score: --</div>
+      <p id="reading-feedback-text">Feedback: Loading...</p>
+    </div>
+    <button class="btn" onclick="startWritingSection()">Proceed to Writing Section</button>
+  </div>
+
+  <!-- 4. WRITING SECTION (3 Prompts - 9 min) -->
+  <div id="sec-writing" class="section">
+    <h2 id="h-wri">4. Writing Test</h2>
+    <p>Write a brief response (about 4-5 lines) for each prompt. Blank or partial entries are accepted.</p>
+    <div id="writing-container"></div>
+    <button class="btn" id="submit-writing-btn" onclick="submitWritingSection()">Submit Writing Responses</button>
+  </div>
+
+  <!-- WRITING PERFORMANCE CARD -->
+  <div id="card-writing" class="section">
+    <h2>Writing Performance Card</h2>
+    <div class="card-box">
+      <div class="score-badge" id="writing-score-text">Status: Submitted</div>
+      <p id="writing-feedback-text">Feedback: Loading...</p>
+    </div>
+    <button class="btn" onclick="showFinalReportCard()">Generate Final Report Card</button>
+  </div>
+
+  <!-- FINAL STUDENT REPORT CARD -->
+  <div id="sec-report-card" class="section">
+    <h2>A2 Assessment Final Answer Script & Report Card</h2>
+    <p>Your responses have been saved.</p>
+    <div id="report-pending" class="card-box" style="display: none;"><p>Thank you. Your test is submitted. Your teacher will share your marks and feedback later.</p></div>
+    <div id="report-details">
+
+    <div class="chart-container">
+      <canvas id="performanceChart" width="400" height="230"></canvas>
+    </div>
+
+    <table class="report-table">
+      <thead>
+        <tr>
+          <th>Skill Section</th>
+          <th>Raw Score / Metric</th>
+          <th>Percentage</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td id="lbl-lis">Listening</td><td id="rep-listening-raw">--</td><td id="rep-listening-pct">--</td><td><span style="color: var(--success); font-weight: bold;">Completed</span></td></tr>
+        <tr><td id="lbl-spk">Speaking</td><td id="rep-speaking-raw">--</td><td id="rep-speaking-pct">--</td><td><span style="color: var(--success); font-weight: bold;">Saved for Teacher Review</span></td></tr>
+        <tr><td id="lbl-read">Reading</td><td id="rep-reading-raw">--</td><td id="rep-reading-pct">--</td><td><span style="color: var(--success); font-weight: bold;">Completed</span></td></tr>
+        <tr><td id="lbl-wri">Writing</td><td id="rep-writing-raw">--</td><td id="rep-writing-pct">--</td><td><span style="color: var(--success); font-weight: bold;">Locked & Archived</span></td></tr>
+      </tbody>
+    </table>
+
+    <div id="rep-comment-box" class="ai-box" style="display: none; margin-top: 16px;"></div>
+
+    <div class="question-block" style="margin-top: 20px;">
+      <h3>Speaking Feedback</h3>
+      <div id="rep-speaking-feedback" style="margin-top: 10px;"></div>
+    </div>
+
+    <div class="question-block" style="margin-top: 20px;">
+      <h3>Writing Submission Script Copy (Read-Only)</h3>
+      <div id="rep-writing-archive" style="margin-top: 10px;"></div>
+    </div>
+
+    </div>
+
+    <button class="btn btn-grey" id="report-back" style="margin-top: 16px; display: none;" onclick="backToReady()">Back</button>
+    <button class="btn" style="background-color: #059669; margin-top: 16px;" onclick="resetForNextStudent()">Start New Assessment for Next Student</button>
+  </div>
+
+  <!-- TEACHER LOGIN SECTION -->
+  <div id="sec-teacher-login" class="section">
+    <h2>Instructor Review Dashboard Login</h2>
+    <p>Access stored student scripts, play audio recordings, and grade writing responses.</p>
+    <form autocomplete="off" onsubmit="event.preventDefault(); authenticateTeacher();">
+      <div class="form-group">
+        <label for="teacher-pass">Teacher Password</label>
+        <input type="password" id="teacher-pass" required placeholder="Enter password" autocomplete="new-password">
+      </div>
+      <button type="submit" class="btn btn-teacher">Authenticate & Load Submissions</button>
+    </form>
+  </div>
+
+  <!-- TEACHER FILTER BAR (shared by the teacher tools) -->
+  <div id="teacher-filter-bar" class="card-box" style="display: none; margin-bottom: 14px; padding: 14px 16px;">
+    <div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end;">
+      <div class="form-group" style="margin: 0; min-width: 170px;">
+        <label for="filter-date">Date</label>
+        <input type="date" id="filter-date" onchange="refreshTeacherScreen()">
+      </div>
+      <div class="form-group" style="margin: 0; min-width: 170px;">
+        <label for="filter-class">Class</label>
+        <select id="filter-class" onchange="refreshTeacherScreen()"><option value="">All classes</option></select>
+      </div>
+      <button class="btn btn-grey" style="margin: 0;" onclick="clearTeacherFilters()">Clear filters</button>
+      <span id="filter-count" class="small-note" style="margin-bottom: 8px;"></span>
+    </div>
+  </div>
+
+  <!-- TEACHER HOME -->
+  <div id="sec-t-home" class="section" style="text-align: center;">
+    <h2>Teacher Home</h2>
+    <p id="t-home-summary" class="small-note"></p>
+    <div class="icon-row">
+      <button type="button" class="test-icon-btn t-ico ti-1" onclick="showTeacherScreen('dash')">
+        <svg viewBox="0 0 64 64" width="56" height="56" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 54V10M10 54h46"></path><rect x="18" y="32" width="8" height="16" rx="2"></rect><rect x="31" y="22" width="8" height="26" rx="2"></rect><rect x="44" y="14" width="8" height="34" rx="2"></rect></svg>
+        <span>Class Dashboard</span>
+      </button>
+      <button type="button" class="test-icon-btn t-ico ti-2" onclick="showTeacherScreen('mark')" style="position: relative;">
+        <span id="t-badge-mark" class="t-badge" style="display: none;"></span>
+        <svg viewBox="0 0 64 64" width="56" height="56" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 52l4-14L42 12l10 10-26 26z"></path><path d="M36 18l10 10"></path><path d="M12 52l14-4"></path></svg>
+        <span>Marking</span>
+      </button>
+      <button type="button" class="test-icon-btn t-ico ti-3" onclick="showTeacherScreen('qa')">
+        <svg viewBox="0 0 64 64" width="56" height="56" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="28" cy="28" r="16"></circle><path d="M40 40l14 14"></path><path d="M24 24a5 5 0 1 1 7 4.5c-2 1-3 2-3 4"></path><path d="M28 37v1"></path></svg>
+        <span>Question Analysis</span>
+      </button>
+      <button type="button" class="test-icon-btn t-ico ti-4" onclick="showTeacherScreen('students')">
+        <svg viewBox="0 0 64 64" width="56" height="56" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="24" cy="22" r="9"></circle><path d="M8 52c0-9 7-15 16-15s16 6 16 15"></path><circle cx="46" cy="24" r="6"></circle><path d="M46 38c7 0 11 5 11 12"></path></svg>
+        <span>Students</span>
+      </button>
+      <button type="button" class="test-icon-btn t-ico ti-5" onclick="showTeacherScreen('results')">
+        <svg viewBox="0 0 64 64" width="56" height="56" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 32L56 10 44 54 31 40z"></path><path d="M31 40l25-30"></path></svg>
+        <span>Results &amp; Sharing</span>
+      </button>
+      <button type="button" class="test-icon-btn t-ico ti-6" onclick="showTeacherScreen('bank')">
+        <svg viewBox="0 0 64 64" width="56" height="56" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 14c8-4 16-4 22 2 6-6 14-6 22-2v36c-8-4-16-4-22 2-6-6-14-6-22-2z"></path><path d="M32 16v36"></path></svg>
+        <span>Question Bank</span>
+      </button>
+    </div>
+    <button class="btn btn-grey" style="margin-top: 22px;" onclick="teacherLogout()">Log out</button>
+  </div>
+
+  <!-- 1. CLASS DASHBOARD -->
+  <div id="sec-t-dash" class="section">
+    <h2>Class Dashboard</h2>
+    <div id="t-dash-content"></div>
+    <button class="btn btn-grey" onclick="showTeacherScreen('home')">&larr; Teacher home</button>
+  </div>
+
+  <!-- 2. MARKING -->
+  <div id="sec-t-mark" class="section">
+    <h2>Marking</h2>
+    <div class="card-box" style="margin: 0 0 14px; padding: 12px 16px; display: flex; flex-wrap: wrap; gap: 14px; align-items: center;">
+      <strong id="mark-count"></strong>
+      <label class="option-label" style="margin: 0; border: none; padding: 0; background: none;"><input type="checkbox" id="only-unmarked" onchange="populateTeacherDropdown()"> Show only students waiting for marks</label>
+      <button class="btn btn-teacher" style="margin: 0;" onclick="nextUnmarked()">Next unmarked student &rarr;</button>
+    </div>
+
+    <div class="form-group" style="margin-bottom: 20px;">
+      <label for="submission-select">Select Student Answer Script (● = waiting for marks, ✓ = marked):</label>
+      <select id="submission-select" onchange="loadSelectedStudentScript()">
+        <option value="">-- No Submissions Found --</option>
+      </select>
+    </div>
+
+    <div id="teacher-student-meta" class="card-box" style="margin-bottom: 20px;"></div>
+
+    <h3>1. Speaking Section: Recordings, Automatic Marks (out of 1 each) & Your Override</h3>
+    <div id="teacher-speaking-reviews" style="margin-bottom: 24px;"></div>
+
+    <h3>2. Writing Section Answer Script & Manual Marks</h3>
+    <div id="teacher-writing-reviews" style="margin-bottom: 24px;"></div>
+
+    <div id="mark-extras" style="display: none;">
+      <h3>3. Comment for the student (optional)</h3>
+      <div id="comment-chips" style="margin-bottom: 6px;"></div>
+      <textarea id="teacher-comment" maxlength="400" style="height: 70px;" placeholder="Click a phrase above or type your own comment. Students see it after you release results."></textarea>
+      <button class="btn btn-teacher" onclick="saveTeacherEvaluation()">Save Marks</button>
+      <button class="btn btn-grey" onclick="exportCurrentStudent()">Export this student (CSV)</button>
+      <span id="save-status" style="margin-left: 10px; font-weight: 600;"></span>
+    </div>
+    <div style="margin-top: 16px;"><button class="btn btn-grey" onclick="showTeacherScreen('home')">&larr; Teacher home</button></div>
+  </div>
+
+  <!-- 3. QUESTION ANALYSIS -->
+  <div id="sec-t-qa" class="section">
+    <h2>Question Analysis</h2>
+    <div id="t-qa-content"></div>
+    <button class="btn btn-grey" onclick="showTeacherScreen('home')">&larr; Teacher home</button>
+  </div>
+
+  <!-- 4. STUDENTS -->
+  <div id="sec-t-students" class="section">
+    <h2>Students</h2>
+    <div class="form-group" style="max-width: 320px;">
+      <label for="student-search">Search by name</label>
+      <input type="text" id="student-search" autocomplete="off" oninput="renderStudents()" placeholder="Type a name">
+    </div>
+    <div id="t-students-content"></div>
+    <button class="btn btn-grey" onclick="showTeacherScreen('home')">&larr; Teacher home</button>
+  </div>
+
+  <!-- 5. RESULTS & SHARING -->
+  <div id="sec-t-results" class="section">
+    <h2>Results &amp; Sharing</h2>
+    <div id="t-results-content"></div>
+    <button class="btn btn-grey" onclick="showTeacherScreen('home')">&larr; Teacher home</button>
+  </div>
+
+  <!-- QUESTION BANK -->
+  <div id="sec-t-bank" class="section">
+    <h2>Question Bank</h2>
+    <div class="card-box">
+      <p class="small-note" id="bank-status"></p>
+      <p class="small-note">1. Download the file. 2. Open it in Excel or Google Sheets and change the questions. 3. Save as CSV and upload it here.</p>
+      <button class="btn btn-teacher" onclick="downloadQuestionFile()">Download question file (CSV)</button>
+      <label class="btn btn-grey" style="display: inline-block; cursor: pointer;">Upload question file<input type="file" accept=".csv,text/csv" style="display: none;" onchange="uploadQuestionFile(this)"></label>
+      <button class="btn btn-grey" onclick="resetQuestionBank()">Use built-in questions</button>
+      <div id="bank-errors" style="margin-top: 8px;"></div>
+      <p class="small-note" style="padding-bottom: 10px; margin-top: 12px;">Speaking answers are marked automatically for free on this computer (no paid service, no account). Check each one and change the mark if you disagree.</p>
+    </div>
+    <button class="btn btn-grey" onclick="showTeacherScreen('home')">&larr; Teacher home</button>
+  </div>
+
+</div>
+
+<script>
+  // State Machine and Central Database Storage (150+ Persistence)
+  let activeMode = 'student';
+  let timerInterval;
+  let timeRemaining = 0;
+
+  // Persistent storage key
+  const DB_STORAGE_KEY = 'A2_ASSESSMENT_SUBMISSION_DATABASE';
+
+  function getSubmissionDatabase() {
+    try {
+      const data = localStorage.getItem(DB_STORAGE_KEY);
+      return data ? JSON.parse(data) : [];
+    } catch(e) {
+      return [];
+    }
+  }
+
+  function saveToSubmissionDatabase(session) {
+    const db = getSubmissionDatabase();
+    db.push(session);
+    try {
+      localStorage.setItem(DB_STORAGE_KEY, JSON.stringify(db));
+    } catch(e) {
+      console.warn('Storage limit reached, keeping in runtime memory.');
+    }
+  }
+
+  // Active student session model
+  let currentStudentSession = null;
+
+  function createNewStudentSession() {
+    return {
+      id: 'SCRIPT_' + Date.now() + '_' + Math.floor(Math.random()*1000),
+      name: '', class: '', roll: '',
+      timestamp: new Date().toLocaleString(),
+      counts: { lis: listeningQuestions.length, read: readingQuestions.length },
+      lisQ: listeningQuestions.map(q => ({ q: q.q, options: q.options.slice(), correct: q.correct })),
+      readQ: readingQuestions.map(q => ({ q: q.q, options: q.options.slice(), correct: q.correct })),
+      spkQ: speakingPrompts.slice(),
+      wriQ: writingPrompts.slice(),
+      listeningAnswers: new Array(listeningQuestions.length).fill(''),
+      listeningScore: 0,
+      readingAnswers: new Array(readingQuestions.length).fill(''),
+      readingScore: 0,
+      listeningPlays: new Array(listeningQuestions.length).fill(0),
+      speakingState: new Array(speakingPrompts.length).fill(false),
+      speakingResults: new Array(speakingPrompts.length).fill(null),
+      writingResponses: new Array(writingPrompts.length).fill(''),
+      writingWordCounts: new Array(writingPrompts.length).fill(0),
+      writingMarks: new Array(writingPrompts.length).fill(null),
+      isGraded: false
+    };
+  }
+
+  // Extended Section Timers (+1 min)
+  const TIMER_CONFIG = {
+    listening: 300, // 5 minutes
+    speaking: 600,  // 10 minutes
+    reading: 300,   // 5 minutes
+    writing: 540    // 9 minutes
+  };
+
+  // ===== Settings you can change =====
+  const SPEAKING_PREP_SECONDS = 12;   // thinking gap before each speaking question (use 10 to 15)
+  const SPEAKING_MAX_SECONDS = 30;    // longest recording for one answer
+  const MAX_LISTEN_PLAYS = 2;         // how many times each listening clip can be played
+  const WRITING_MAX_MARKS = 5;        // marks the teacher can give for each writing prompt
+  const TEACHER_PASSWORD = 'admin123';// CHANGE THIS. Anyone who views the page source can read it.
+  const RELEASE_STORAGE = 'A2_RESULTS_RELEASED';
+
+  // Words used only by the simple rule-based marking (when no AI key is saved). One list per speaking prompt.
+  let speakingKeywords = [
+    ["wake", "get up", "got up", "brush", "teeth", "bath", "breakfast", "eat", "ate", "dress", "uniform", "ready", "morning", "bus", "pray", "exercise", "walk", "milk", "tea"],
+    ["subject", "favourite", "favorite", "math", "science", "english", "hindi", "social", "computer", "history", "geography", "art", "music", "interesting", "fun", "teacher", "easy", "enjoy", "learn"],
+    ["play", "game", "sport", "cricket", "football", "kabaddi", "badminton", "volleyball", "basketball", "chess", "kho", "hockey", "tennis", "friend", "classmate", "ground", "team", "outdoor"],
+    ["help", "friend", "mother", "father", "sister", "brother", "family", "mom", "mum", "dad", "grandmother", "grandfather", "homework", "cook", "clean", "carry", "shop", "work", "teach"],
+    ["season", "summer", "winter", "rainy", "monsoon", "spring", "autumn", "rain", "hot", "cold", "weather", "mango", "sweater", "holiday", "vacation", "fan"],
+    ["trip", "visit", "went", "go", "place", "museum", "zoo", "park", "fort", "beach", "temple", "picnic", "excursion", "bus", "saw", "see", "travel", "memorable"],
+    ["book", "story", "film", "movie", "read", "watch", "character", "hero", "learn", "funny", "cartoon", "novel", "tale", "king", "animal", "adventure"],
+    ["clean", "dirty", "garbage", "waste", "dustbin", "litter", "tree", "plant", "green", "health", "germ", "disease", "sick", "environment", "beautiful", "smell", "throw", "trash", "campus"],
+    ["festival", "diwali", "holi", "eid", "christmas", "onam", "pongal", "durga", "puja", "celebrate", "sweets", "lights", "crackers", "new clothes", "family", "food", "pray", "gift", "rangoli"],
+    ["want", "become", "grow", "doctor", "teacher", "engineer", "pilot", "police", "scientist", "cricketer", "artist", "job", "help", "future", "dream", "ambition", "career", "officer", "singer", "business"]
+  ];
+
+  /* ---------------- SVG NEUTRAL ILLUSTRATIONS (No Answer Leaks) ---------------- */
+  const svgNeutralContexts = {
+    schoolLab: `<svg width="120" height="60" viewBox="0 0 120 60"><rect width="120" height="60" fill="#e2e8f0" rx="6"/><path d="M20 45 h80 M30 45 v-15 h20 v15 M70 45 v-20 h20 v20" stroke="#475569" stroke-width="3" fill="none"/><circle cx="40" cy="20" r="5" fill="#3b82f6"/><rect x="75" y="15" width="10" height="10" fill="#10b981"/></svg>`,
+    cityMap: `<svg width="120" height="60" viewBox="0 0 120 60"><rect width="120" height="60" fill="#e2e8f0" rx="6"/><path d="M10 30 h100 M60 5 v50" stroke="#94a3b8" stroke-width="8"/><path d="M10 30 h100 M60 5 v50" stroke="#ffffff" stroke-width="4"/><circle cx="60" cy="30" r="6" fill="#ef4444"/><rect x="20" y="10" width="15" height="12" fill="#64748b"/><rect x="80" y="38" width="15" height="12" fill="#64748b"/></svg>`,
+    scheduleClock: `<svg width="120" height="60" viewBox="0 0 120 60"><rect width="120" height="60" fill="#e2e8f0" rx="6"/><circle cx="60" cy="30" r="22" fill="#ffffff" stroke="#475569" stroke-width="3"/><path d="M60 30 L60 16 M60 30 L72 30" stroke="#2563eb" stroke-width="3" stroke-linecap="round"/></svg>`,
+    busStation: `<svg width="120" height="60" viewBox="0 0 120 60"><rect width="120" height="60" fill="#e2e8f0" rx="6"/><rect x="25" y="15" width="70" height="30" rx="4" fill="#3b82f6"/><circle cx="40" cy="45" r="5" fill="#1e293b"/><circle cx="80" cy="45" r="5" fill="#1e293b"/><rect x="32" y="20" width="15" height="10" fill="#ffffff"/><rect x="52" y="20" width="15" height="10" fill="#ffffff"/><rect x="72" y="20" width="15" height="10" fill="#ffffff"/></svg>`,
+    library: `<svg width="120" height="60" viewBox="0 0 120 60"><rect width="120" height="60" fill="#e2e8f0" rx="6"/><path d="M15 50 v-30 h90 v30 M15 35 h90 M15 20 h90" stroke="#64748b" stroke-width="3"/><rect x="20" y="23" width="8" height="12" fill="#f59e0b"/><rect x="30" y="23" width="8" height="12" fill="#10b981"/><rect x="40" y="23" width="8" height="12" fill="#ef4444"/><rect x="60" y="38" width="8" height="12" fill="#8b5cf6"/></svg>`
+  };
+
+  /* ---------------- CEFR A2 DATASETS ---------------- */
+  // 10 Listening Questions (Neutral context images - no hints)
+  let listeningQuestions = [
+    { id: 1, svg: svgNeutralContexts.scheduleClock, text: "Audio Clip 1: Attention students. The annual science exhibition starts at quarter past ten in the main auditorium.", q: "What time does the science exhibition begin?", options: ["9:45 AM", "10:15 AM", "10:30 AM", "11:15 AM"], correct: "10:15 AM" },
+    { id: 2, svg: svgNeutralContexts.busStation, text: "Audio Clip 2: The school bus for Route 4 will depart from Gate B today due to construction near Gate A.", q: "Where will Route 4 bus depart from today?", options: ["Gate A", "Gate B", "Gate C", "Main Entrance"], correct: "Gate B" },
+    { id: 3, svg: svgNeutralContexts.library, text: "Audio Clip 3: Library notice: Students can borrow up to three storybooks for a duration of two weeks.", q: "How long can students keep borrowed books?", options: ["1 week", "2 weeks", "3 weeks", "1 month"], correct: "2 weeks" },
+    { id: 4, svg: svgNeutralContexts.schoolLab, text: "Audio Clip 4: In computer lab, remember to save your work in your personal folder before turning off the system.", q: "What should students do before shutting down the system?", options: ["Delete files", "Save work in personal folder", "Inform the teacher", "Turn off monitor first"], correct: "Save work in personal folder" },
+    { id: 5, svg: svgNeutralContexts.cityMap, text: "Audio Clip 5: To reach the art room, turn right after the staffroom and go upstairs to the second floor.", q: "Where is the art room located?", options: ["First floor near staffroom", "Second floor past the staffroom", "Ground floor auditorium", "Basement lab"], correct: "Second floor past the staffroom" },
+    { id: 6, svg: svgNeutralContexts.scheduleClock, text: "Audio Clip 6: The sports practice session has been shifted from Friday afternoon to Saturday morning at 8 AM.", q: "When will the sports practice take place?", options: ["Friday afternoon", "Friday evening", "Saturday morning", "Sunday morning"], correct: "Saturday morning" },
+    { id: 7, svg: svgNeutralContexts.library, text: "Audio Clip 7: Please bring a notebook, a blue pen, and a ruler for the geography workshop tomorrow.", q: "Which item is NOT mentioned for the workshop?", options: ["Notebook", "Blue pen", "Ruler", "Colored pencils"], correct: "Colored pencils" },
+    { id: 8, svg: svgNeutralContexts.busStation, text: "Audio Clip 8: The cafeteria will serve fresh fruit salad and vegetable sandwiches during lunch break today.", q: "What will be served in the cafeteria?", options: ["Burger and fries", "Fruit salad and vegetable sandwiches", "Pasta and juice", "Soup and bread"], correct: "Fruit salad and vegetable sandwiches" },
+    { id: 9, svg: svgNeutralContexts.schoolLab, text: "Audio Clip 9: Rohan won the first prize in the inter-school quiz competition by scoring 95 points.", q: "How many points did Rohan score?", options: ["85 points", "90 points", "95 points", "100 points"], correct: "95 points" },
+    { id: 10, svg: svgNeutralContexts.cityMap, text: "Audio Clip 10: The environmental club meeting is postponed to next Tuesday due to heavy rain.", q: "Why was the club meeting postponed?", options: ["Teacher was absent", "Heavy rain", "Exams scheduled", "Public holiday"], correct: "Heavy rain" }
+  ];
+
+  // 10 A2 Speaking Prompts
+  let speakingPrompts = [
+    "What do you do in the morning before you come to school?",
+    "What is your favourite school subject, and why do you like it?",
+    "Which game or sport do you like to play with your friends?",
+    "How did you help a friend or a family member recently?",
+    "Which season do you like best, and what do you do in that season?",
+    "Tell me about a school trip or a place you visited. What did you see?",
+    "Tell me about a book, story or movie you liked. Why did you like it?",
+    "Why is it important to keep our school clean and green?",
+    "Which festival do you like most, and how does your family celebrate it?",
+    "What do you want to become in the future, and why?"
+  ];
+
+  // 10 A2 Reading Questions
+  let readingQuestions = [
+    { id: 1, passage: "Notice: The Green Earth Club is organizing a tree plantation drive on July 15th. All students are invited to participate. Saplings will be provided by the school garden department.", q: "Who can participate in the plantation drive?", options: ["Only Class 10 students", "All students of the school", "Teachers only", "Parents and public"], correct: "All students of the school" },
+    { id: 2, passage: "Notice: The Green Earth Club drive starts at 9:00 AM near the sports ground. Participants must wear school sports uniform and bring water bottles.", q: "What are participants required to wear?", options: ["Regular school uniform", "School sports uniform", "Casual clothes", "Lab coats"], correct: "School sports uniform" },
+    { id: 3, passage: "Email Excerpt: Dear Priya, I am writing to invite you to my birthday party this Sunday at 4 PM at Sunshine Cafe. We will play board games and eat pizza. Please let me know if you can come by Friday.", q: "By when should Priya confirm her attendance?", options: ["Friday", "Saturday", "Sunday morning", "At the party"], correct: "Friday" },
+    { id: 4, passage: "Email Excerpt: Sunshine Cafe is located opposite the central library on Park Street. You can take the metro to Park Street station.", q: "Where is Sunshine Cafe situated?", options: ["Inside the central library", "Opposite the central library", "Next to the metro station", "On Main Avenue"], correct: "Opposite the central library" },
+    { id: 5, passage: "Article: Solar energy is renewable and clean. Many schools in India are installing rooftop solar panels to generate electricity, reduce power bills, and protect the environment.", q: "What is a main benefit of rooftop solar panels mentioned?", options: ["Increase water supply", "Generate electricity and lower power bills", "Replace internet cables", "Decorate roofs"], correct: "Generate electricity and lower power bills" },
+    { id: 6, passage: "Article: Solar panels convert sunlight directly into electric current using photovoltaic cells. They work most efficiently on sunny days with clear skies.", q: "When do solar panels operate most efficiently?", options: ["On rainy days", "During night time", "On sunny days with clear skies", "In winter fogs"], correct: "On sunny days with clear skies" },
+    { id: 7, passage: "Story: Vikram was preparing for the district spelling bee competition. He practiced thirty new vocabulary words every evening with his elder sister.", q: "How did Vikram prepare for the competition?", options: ["By watching TV", "Practicing 30 words daily with his sister", "Studying alone late at night", "Reading comic books"], correct: "Practicing 30 words daily with his sister" },
+    { id: 8, passage: "Story: Hard work paid off when Vikram reached the final round and correctly spelled the winning word 'PERSEVERANCE'.", q: "What was the winning word Vikram spelled?", options: ["PERFORMANCE", "PERSEVERANCE", "PRESERVATION", "PERMISSION"], correct: "PERSEVERANCE" },
+    { id: 9, passage: "Guide: To maintain good health, school students should sleep 8 to 9 hours daily, eat balanced meals, and limit screen time on smartphones.", q: "How many hours of sleep are recommended daily for students?", options: ["5 to 6 hours", "6 to 7 hours", "8 to 9 hours", "10 to 12 hours"], correct: "8 to 9 hours" },
+    { id: 10, passage: "Guide: Physical exercise like swimming, cycling, or fast walking for 30 minutes daily strengthens muscles and improves concentration in studies.", q: "How does daily physical exercise aid students academically?", options: ["It replaces studying time", "It improves concentration in studies", "It eliminates homework", "It guarantees top ranks"], correct: "It improves concentration in studies" }
+  ];
+
+  // 3 A2 Writing Prompts (Toned down - 4-5 lines concise response)
+  let writingPrompts = [
+    "Prompt 1: Write a short paragraph (4-5 lines) introducing yourself, your class, your hobbies, and your favorite subject.",
+    "Prompt 2: Write a short message (4-5 lines) to your friend inviting them to spend the weekend at your house.",
+    "Prompt 3: Describe your school library or science lab in 4-5 simple sentences."
+  ];
+
+  /* ---------------- QUESTION BANK (teacher can replace the questions from a CSV file) ---------------- */
+  const BANK_STORAGE_KEY = 'A2_QUESTION_BANK';
+  const BANK_COLUMNS = ['section', 'question', 'option_a', 'option_b', 'option_c', 'option_d', 'correct', 'audio_text', 'passage', 'keywords'];
+  const LETTERS = ['A', 'B', 'C', 'D'];
+
+  // Small CSV reader (handles quotes, commas and line breaks inside cells, Excel's BOM)
+  function parseCSV(text) {
+    text = String(text || '').replace(/^﻿/, '');
+    const rows = []; let row = [], cell = '', inQ = false;
+    for (let i = 0; i < text.length; i++) {
+      const ch = text[i];
+      if (inQ) {
+        if (ch === '"') { if (text[i + 1] === '"') { cell += '"'; i++; } else inQ = false; }
+        else cell += ch;
+      } else if (ch === '"') inQ = true;
+      else if (ch === ',') { row.push(cell); cell = ''; }
+      else if (ch === '\n' || ch === '\r') {
+        if (ch === '\r' && text[i + 1] === '\n') i++;
+        row.push(cell); cell = '';
+        if (row.some(c => c.trim() !== '')) rows.push(row);
+        row = [];
+      } else cell += ch;
+    }
+    row.push(cell);
+    if (row.some(c => c.trim() !== '')) rows.push(row);
+    return rows;
+  }
+
+  function currentBankRows() {
+    const rows = [BANK_COLUMNS];
+    listeningQuestions.forEach(q => rows.push(['listening', q.q, q.options[0] || '', q.options[1] || '', q.options[2] || '', q.options[3] || '', LETTERS[q.options.indexOf(q.correct)] || '', q.text.replace(/^Audio Clip \d+:\s*/i, ''), '', '']));
+    speakingPrompts.forEach((q, i) => rows.push(['speaking', q, '', '', '', '', '', '', '', (speakingKeywords[i] || []).join(';')]));
+    readingQuestions.forEach(q => rows.push(['reading', q.q, q.options[0] || '', q.options[1] || '', q.options[2] || '', q.options[3] || '', LETTERS[q.options.indexOf(q.correct)] || '', '', q.passage, '']));
+    writingPrompts.forEach(q => rows.push(['writing', q, '', '', '', '', '', '', '', '']));
+    return rows;
+  }
+
+  function downloadQuestionFile() {
+    downloadCSV(currentBankRows(), 'A2_Question_Bank.csv');
+  }
+
+  // Turn uploaded rows into the four question lists. Returns {bank} or {errors}
+  function buildBankFromRows(rows) {
+    const errors = [];
+    if (!rows.length) return { errors: ['The file is empty.'] };
+    const head = rows[0].map(h => h.trim().toLowerCase());
+    const col = {};
+    BANK_COLUMNS.forEach(n => { col[n] = head.indexOf(n); });
+    if (col.section < 0 || col.question < 0) return { errors: ['The first row must contain the column names "section" and "question". Please start from the template.'] };
+    const get = (r, n) => (col[n] >= 0 && r[col[n]] !== undefined ? String(r[col[n]]).trim() : '');
+    const bank = { listening: [], speaking: [], reading: [], writing: [], keywords: [] };
+    const defaultSvgs = Object.values(svgNeutralContexts);
+    rows.slice(1).forEach((r, k) => {
+      const line = k + 2;
+      const section = get(r, 'section').toLowerCase();
+      const question = get(r, 'question');
+      if (!section && !question) return;
+      if (!['listening', 'speaking', 'reading', 'writing'].includes(section)) { errors.push(`Row ${line}: section must be listening, speaking, reading or writing (found "${section}").`); return; }
+      if (!question) { errors.push(`Row ${line}: the question is empty.`); return; }
+      if (section === 'speaking') { bank.speaking.push(question); bank.keywords.push(get(r, 'keywords').split(/[;|]/).map(x => x.trim().toLowerCase()).filter(Boolean)); return; }
+      if (section === 'writing') { bank.writing.push(question); return; }
+      const opts = ['option_a', 'option_b', 'option_c', 'option_d'].map(n => get(r, n));
+      const filled = opts.filter(Boolean);
+      const letter = get(r, 'correct').toUpperCase();
+      const ci = LETTERS.indexOf(letter);
+      if (filled.length < 2) { errors.push(`Row ${line}: at least two options are needed.`); return; }
+      if (ci < 0 || !opts[ci]) { errors.push(`Row ${line}: "correct" must be A, B, C or D and point to a filled option.`); return; }
+      if (new Set(filled.map(o => o.toLowerCase())).size !== filled.length) { errors.push(`Row ${line}: two options are identical.`); return; }
+      if (section === 'listening') {
+        const audio = get(r, 'audio_text');
+        if (!audio) { errors.push(`Row ${line}: audio_text (the sentence read aloud) is empty.`); return; }
+        const id = bank.listening.length + 1;
+        bank.listening.push({ id: id, svg: defaultSvgs[(id - 1) % defaultSvgs.length], text: `Audio Clip ${id}: ${audio}`, q: question, options: filled, correct: opts[ci] });
+      } else {
+        const passage = get(r, 'passage');
+        if (!passage) { errors.push(`Row ${line}: passage is empty.`); return; }
+        bank.reading.push({ id: bank.reading.length + 1, passage: passage, q: question, options: filled, correct: opts[ci] });
+      }
+    });
+    ['listening', 'speaking', 'reading', 'writing'].forEach(s => { if (!bank[s].length) errors.push(`No ${s} questions found. Each section needs at least one.`); });
+    if (bank.listening.length > 40 || bank.speaking.length > 20 || bank.reading.length > 40 || bank.writing.length > 10) errors.push('Too many questions: limits are 40 listening, 20 speaking, 40 reading and 10 writing.');
+    return errors.length ? { errors: errors } : { bank: bank };
+  }
+
+  function applyQuestionBank() {
+    let saved = null;
+    try { saved = JSON.parse(localStorage.getItem(BANK_STORAGE_KEY) || 'null'); } catch (e) {}
+    if (!saved || !saved.listening || !saved.speaking || !saved.reading || !saved.writing) return false;
+    const defaultSvgs = Object.values(svgNeutralContexts);
+    listeningQuestions = saved.listening.map((q, i) => Object.assign({}, q, { id: i + 1, svg: defaultSvgs[i % defaultSvgs.length] }));
+    speakingPrompts = saved.speaking;
+    speakingKeywords = saved.keywords || [];
+    readingQuestions = saved.reading;
+    writingPrompts = saved.writing;
+    return true;
+  }
+
+  function refreshCountsText() {
+    const m = k => Math.round(TIMER_CONFIG[k] / 60);
+    const L = listeningQuestions.length, S = speakingPrompts.length, R = readingQuestions.length, W = writingPrompts.length;
+    const set = (id, t) => { const el = document.getElementById(id); if (el) el.innerText = t; };
+    const intro = document.getElementById('intro-counts');
+    if (intro) intro.innerHTML = `${L} Q's for Listening skill test<br>${S} Q's for Speaking skill test<br>${R} Q's for Reading skill test<br>${W} Q's for Writing test`;
+    set('h-lis', `1. Listening Test (${L} Questions - ${m('listening')} Minutes)`);
+    set('h-spk', `2. Speaking Test (${S} Questions - ${m('speaking')} Minutes)`);
+    set('h-read', `3. Reading Test (${R} Questions - ${m('reading')} Minutes)`);
+    set('h-wri', `4. Writing Test (${W} Prompts - ${m('writing')} Minutes)`);
+    set('lbl-lis', `Listening (${L} Qs)`);
+    set('lbl-spk', `Speaking (${S} Qs)`);
+    set('lbl-read', `Reading (${R} Qs)`);
+    set('lbl-wri', `Writing (${W} Prompts)`);
+    set('bank-status', `Questions in use: ${L} listening, ${S} speaking, ${R} reading, ${W} writing. ${localStorage.getItem(BANK_STORAGE_KEY) ? '(your uploaded set)' : '(built-in set)'}`);
+  }
+
+  function uploadQuestionFile(input) {
+    const file = input.files && input.files[0];
+    const box = document.getElementById('bank-errors');
+    box.innerHTML = '';
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = buildBankFromRows(parseCSV(reader.result));
+      input.value = '';
+      if (result.errors) {
+        box.innerHTML = '<p style="color: var(--danger); font-weight: 600;">Nothing was changed. Please fix these and upload again:</p><ul style="margin-left: 20px; font-size: 0.85rem; color: var(--danger);">' + result.errors.slice(0, 15).map(e => `<li>${esc(e)}</li>`).join('') + (result.errors.length > 15 ? `<li>...and ${result.errors.length - 15} more</li>` : '') + '</ul>';
+        return;
+      }
+      if (!confirm('Replace the current questions with this file? Tests already taken keep their own questions and marks.')) return;
+      try { localStorage.setItem(BANK_STORAGE_KEY, JSON.stringify(result.bank)); }
+      catch (e) { box.innerHTML = '<p style="color: var(--danger);">Could not save in this browser (storage is full).</p>'; return; }
+      applyQuestionBank();
+      refreshCountsText();
+      box.innerHTML = '<p style="color: var(--success); font-weight: 600;">Questions updated. They are used from the next student onwards.</p>';
+    };
+    reader.readAsText(file, 'UTF-8');
+  }
+
+  function resetQuestionBank() {
+    if (!confirm('Go back to the built-in questions?')) return;
+    try { localStorage.removeItem(BANK_STORAGE_KEY); } catch (e) {}
+    location.reload();
+  }
+
+  applyQuestionBank();
+
+  // Helper UI Functions
+  function showSection(id) {
+    document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+  }
+
+  function switchMode(mode) {
+    activeMode = mode;
+    document.getElementById('teacher-filter-bar').style.display = 'none';
+    document.getElementById('tab-student').classList.toggle('active', mode === 'student');
+    document.getElementById('tab-teacher').classList.toggle('active', mode === 'teacher');
+    
+    if (mode === 'student') {
+      document.getElementById('module-title').innerText = "A2 CEFR Assessment Platform";
+      if (!currentStudentSession) document.getElementById('student-info-display').innerText = 'Please Login to Begin';
+      showSection('sec-student-login');
+    } else {
+      document.getElementById('module-title').innerText = "Instructor Portal";
+      document.getElementById('student-info-display').innerText = 'Teacher view';
+      document.getElementById('timer-display').style.display = 'none';
+      showSection('sec-teacher-login');
+    }
+  }
+
+  // Timer Engine
+  function startTimer(seconds, onTimeout) {
+    clearInterval(timerInterval);
+    timeRemaining = seconds;
+    updateTimerDisplay();
+
+    timerInterval = setInterval(() => {
+      timeRemaining--;
+      updateTimerDisplay();
+      if (timeRemaining <= 0) {
+        clearInterval(timerInterval);
+        onTimeout();
+      }
+    }, 1000);
+  }
+
+  function updateTimerDisplay() {
+    const mins = Math.floor(timeRemaining / 60);
+    const secs = timeRemaining % 60;
+    document.getElementById('timer-display').innerText = 
+      `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  }
+
+  // Web Audio Success Chime
+  function playSuccessChime() {
+    try {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(587.33, ctx.currentTime); // D5
+      osc.frequency.setValueAtTime(880, ctx.currentTime + 0.1); // A5
+      gain.gain.setValueAtTime(0.2, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.35);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.35);
+    } catch(e){}
+  }
+
+  // Female Indian English Speech Synthesis Engine
+  function playSynthesizedSample(qNum) {
+    const used = currentStudentSession.listeningPlays[qNum - 1] || 0;
+    if (used >= MAX_LISTEN_PLAYS) { alert('You have already played this audio the maximum number of times.'); return; }
+    currentStudentSession.listeningPlays[qNum - 1] = used + 1;
+    const playsLabel = document.getElementById('lis-plays-' + qNum);
+    if (playsLabel) playsLabel.innerText = (MAX_LISTEN_PLAYS - used - 1) + ' plays left';
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+      const msg = new SpeechSynthesisUtterance(listeningQuestions[qNum - 1].text);
+      
+      const voices = window.speechSynthesis.getVoices();
+      // Look for female or Indian English voice
+      const femaleIndianVoice = voices.find(v => (v.lang.includes('en-IN') || v.name.includes('India') || v.name.includes('Zira') || v.name.includes('Samantha') || v.name.includes('Female')));
+      if (femaleIndianVoice) {
+        msg.voice = femaleIndianVoice;
+      }
+
+      msg.rate = 0.85; // Slow & clear
+      msg.pitch = 1.2;  // Female articulation
+      window.speechSynthesis.speak(msg);
+    } else {
+      alert(`Playing Audio Track #${qNum}...`);
+    }
+  }
+
+  /* ---------------- HELPERS (escaping, CSV, release flag, audio storage, AI marking) ---------------- */
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+
+  // Quote a CSV cell and neutralise spreadsheet formulas typed by students
+  function csvCell(v) {
+    let s = String(v == null ? '' : v);
+    if (/^[=+\-@\t\r]/.test(s)) s = "'" + s;
+    return '"' + s.replace(/"/g, '""') + '"';
+  }
+
+  function downloadCSV(rows, fileName) {
+    const text = '﻿' + rows.map(r => r.map(csvCell).join(',')).join('\r\n');
+    const blob = new Blob([text], { type: 'text/csv;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    setTimeout(() => URL.revokeObjectURL(url), 2000);
+  }
+
+
+  // Audio clips live in IndexedDB (blob URLs are lost on reload and localStorage is too small)
+  let _audioDb = null;
+  function audioDB() {
+    return new Promise((resolve, reject) => {
+      if (_audioDb) return resolve(_audioDb);
+      const req = indexedDB.open('A2_AUDIO_CLIPS', 1);
+      req.onupgradeneeded = () => req.result.createObjectStore('clips');
+      req.onsuccess = () => { _audioDb = req.result; resolve(_audioDb); };
+      req.onerror = () => reject(req.error);
+    });
+  }
+  function saveClip(key, blob) {
+    return audioDB().then(db => new Promise((resolve, reject) => {
+      const tx = db.transaction('clips', 'readwrite');
+      tx.objectStore('clips').put(blob, key);
+      tx.oncomplete = () => resolve(true);
+      tx.onerror = () => reject(tx.error);
+    })).catch(e => { console.warn('Could not store audio clip', e); return false; });
+  }
+  function loadClip(key) {
+    return audioDB().then(db => new Promise((resolve, reject) => {
+      const req = db.transaction('clips', 'readonly').objectStore('clips').get(key);
+      req.onsuccess = () => resolve(req.result || null);
+      req.onerror = () => reject(req.error);
+    })).catch(() => null);
+  }
+
+  // ---------- Speaking marks: 0 = not relevant, 0.5 = one relevant complete sentence, 1 = more than one ----------
+  function toSpeakingMark(relevant, sentences) {
+    if (!relevant) return 0;
+    if (sentences >= 2) return 1;
+    if (sentences === 1) return 0.5;
+    return 0;
+  }
+
+  function speakingFeedbackFor(mark, relevant) {
+    if (mark === 1) return 'Good answer. It matches the question and uses more than one complete sentence.';
+    if (mark === 0.5) return 'Relevant, but try to say more than one complete sentence.';
+    if (!relevant) return 'This answer does not match the question asked. Listen to the question again and answer it directly.';
+    return 'Speak in complete sentences to earn marks.';
+  }
+
+  const SpeechRecognitionCtor = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+  // Simple offline estimate used when no AI key is saved or the AI call fails
+  function ruleBasedSpeakingMark(idx, transcript) {
+    const text = (transcript || '').toLowerCase().replace(/[^a-z0-9\s']/g, ' ').replace(/\s+/g, ' ').trim();
+    const words = text ? text.split(' ') : [];
+    const keywords = speakingKeywords[idx] || [];
+    const hits = new Set(keywords.filter(k => (' ' + text + ' ').includes(' ' + k) )).size;
+    // relevant: enough words and at least one topic word from the question
+    const relevant = words.length >= 4 && hits >= 1;
+    // sentence estimate: speech-to-text has no full stops, so use length and joining words
+    const joiners = (text.match(/\b(because|and|but|also|then|so|when|after|before)\b/g) || []).length;
+    const punct = (transcript || '').split(/[.!?]+/).filter(p => p.trim().split(/\s+/).filter(Boolean).length >= 4).length;
+    let sentences = 0;
+    if (words.length >= 5) sentences = 1;
+    if (words.length >= 12 || punct >= 2 || (words.length >= 9 && joiners >= 1)) sentences = 2;
+    const mark = toSpeakingMark(relevant, sentences);
+    return { score: mark, relevant, sentences, feedback: speakingFeedbackFor(mark, relevant), method: 'rules' };
+  }
+
+  // Returns {score, feedback, method}. score is null when nothing could be judged (teacher marks it).
+  async function scoreSpeakingAnswer(idx, transcript, recogUnavailable) {
+    const t = (transcript || '').trim();
+    if (!t) {
+      if (!SpeechRecognitionCtor || recogUnavailable) {
+        return { score: null, relevant: false, sentences: 0, feedback: 'Your answer is recorded. Your teacher will mark it.', method: 'pending' };
+      }
+      return { score: 0, relevant: false, sentences: 0, feedback: 'No speech was detected. Speak clearly into the microphone.', method: 'rules' };
+    }
+    return ruleBasedSpeakingMark(idx, t);
+  }
+
+  function spkQs(s) { return (s && s.spkQ) || speakingPrompts; }
+  function wriQs(s) { return (s && s.wriQ) || writingPrompts; }
+  function lisN(s) { return (s && s.counts && s.counts.lis) || 10; }
+  function readN(s) { return (s && s.counts && s.counts.read) || 10; }
+  function speakingFinalMark(s, i) {
+    const r = s.speakingResults && s.speakingResults[i];
+    if (!r) return 0;
+    const v = (r.override !== null && r.override !== undefined) ? r.override : r.score;
+    return (v === null || v === undefined) ? 0 : Number(v);
+  }
+  function speakingTotal(s) {
+    let t = 0;
+    for (let i = 0; i < spkQs(s).length; i++) t += speakingFinalMark(s, i);
+    return t;
+  }
+  function writingGraded(s) {
+    return Array.isArray(s.writingMarks) && s.writingMarks.length === wriQs(s).length && s.writingMarks.every(m => m !== null && m !== undefined && m !== '');
+  }
+  function writingTotal(s) {
+    return writingGraded(s) ? s.writingMarks.reduce((a, b) => a + Number(b), 0) : 0;
+  }
+  const pendingScorePromises = [];
+
+  /* ---------------- STUDENT WORKFLOW ---------------- */
+  /* ---------------- STUDENT HOME: Test / Dashboard / Results ---------------- */
+  function sameStudent(a, b) {
+    const n = x => String(x || '').trim().toLowerCase();
+    return n(a.name) === n(b.name) && n(a.class) === n(b.class) && n(a.roll) === n(b.roll);
+  }
+  function mySubmissions(sess) {
+    return getSubmissionDatabase().filter(x => sameStudent(x, sess));
+  }
+
+  // Percent per skill for one saved submission (writing is null until the teacher marks it)
+  function skillPercents(s) {
+    const wMax = wriQs(s).length * WRITING_MAX_MARKS;
+    return {
+      lis: Math.round((s.listeningScore / lisN(s)) * 100),
+      spk: Math.round((speakingTotal(s) / spkQs(s).length) * 100),
+      read: Math.round((s.readingScore / readN(s)) * 100),
+      wri: writingGraded(s) ? Math.round((writingTotal(s) / wMax) * 100) : null
+    };
+  }
+  function overallPercent(s) {
+    const p = skillPercents(s);
+    const v = [p.lis, p.spk, p.read, p.wri].filter(x => x !== null);
+    return Math.round(v.reduce((a, b) => a + b, 0) / v.length);
+  }
+
+  function showReady() {
+    const s = currentStudentSession;
+    document.getElementById('module-title').innerText = "A2 CEFR Assessment Platform";
+    document.getElementById('timer-display').style.display = 'none';
+    document.getElementById('ready-hello').innerText = `Hello, ${s.name}`;
+    document.getElementById('ready-msg').innerText = '';
+    const btn = document.getElementById('test-icon-btn');
+    btn.disabled = !!s.finished;
+    document.getElementById('test-icon-label').innerText = s.finished ? 'Test submitted' : 'A2 English Test';
+    showSection('sec-ready');
+  }
+
+  function openResults() {
+    const mine = mySubmissions(currentStudentSession);
+    if (!mine.length) { document.getElementById('ready-msg').innerText = 'You have not completed a test yet.'; return; }
+    showFinalReportCard(mine[mine.length - 1]);
+  }
+
+  function bar(label, pct, avg) {
+    const p = pct === null ? 0 : pct;
+    return `<div style="margin: 10px 0;">
+      <div style="display: flex; justify-content: space-between; font-size: 0.9rem; font-weight: 600;"><span>${label}</span><span>${pct === null ? 'Awaiting teacher marks' : pct + '%'}</span></div>
+      <div class="dash-track"><div class="dash-fill" style="width: ${p}%;"></div>${avg === null || avg === undefined ? '' : `<div class="dash-avg" style="left: ${avg}%;" title="Class average ${avg}%"></div>`}</div>
+    </div>`;
+  }
+
+  function openDashboard() {
+    const s = currentStudentSession;
+    const mine = mySubmissions(s);
+    const box = document.getElementById('dashboard-content');
+    document.getElementById('module-title').innerText = "My Dashboard";
+    showSection('sec-dashboard');
+
+    if (!mine.length) {
+      box.innerHTML = '<div class="card-box"><p>No completed test yet. Take the test and your dashboard will appear here.</p></div>';
+      return;
+    }
+    const latest = mine[mine.length - 1];
+    if (!resultsReleased(latest)) {
+      box.innerHTML = `<div class="card-box"><p><strong>Latest test:</strong> ${esc(latest.timestamp)}</p>
+        <p><strong>Tests taken:</strong> ${mine.length}</p>
+        <p>Your marks and progress will appear here when your teacher shares the results.</p></div>`;
+      return;
+    }
+
+    const p = skillPercents(latest);
+    const overall = overallPercent(latest);
+    const names = { lis: 'Listening', spk: 'Speaking', read: 'Reading', wri: 'Writing' };
+
+    // class average (anonymous), only when at least 3 classmates have results
+    const all = getSubmissionDatabase();
+    const latestPer = new Map();
+    all.filter(x => String(x.class || '').trim().toLowerCase() === String(latest.class || '').trim().toLowerCase())
+       .forEach(x => latestPer.set(String(x.name).trim().toLowerCase() + '|' + String(x.roll).trim().toLowerCase(), x));
+    const classmates = [...latestPer.values()];
+    let avg = null;
+    if (classmates.length >= 3) {
+      avg = {};
+      ['lis', 'spk', 'read', 'wri'].forEach(k => {
+        const v = classmates.map(x => skillPercents(x)[k]).filter(x => x !== null);
+        avg[k] = v.length ? Math.round(v.reduce((a, b) => a + b, 0) / v.length) : null;
+      });
+    }
+
+    // progress vs the previous attempt
+    let change = '';
+    if (mine.length > 1) {
+      const diff = overall - overallPercent(mine[mine.length - 2]);
+      change = diff === 0 ? 'Same as your previous test.' : (diff > 0 ? `Up ${diff} points from your previous test.` : `Down ${Math.abs(diff)} points from your previous test.`);
+    }
+
+    // strongest and focus area
+    const ranked = ['lis', 'spk', 'read', 'wri'].filter(k => p[k] !== null).sort((a, b) => p[b] - p[a]);
+    const best = ranked[0], weak = ranked[ranked.length - 1];
+    const focus = ranked.length > 1 && p[best] !== p[weak]
+      ? `<p><strong>Strongest skill:</strong> ${names[best]} (${p[best]}%)<br><strong>Practise next:</strong> ${names[weak]} (${p[weak]}%)</p>` : '';
+
+    // tip from the lowest speaking answer
+    let tip = '';
+    const sr = (latest.speakingResults || []);
+    const low = sr.map((r, i) => ({ r, i })).filter(x => x.r && x.r.feedback && speakingFinalMark(latest, x.i) < 1).sort((a, b) => speakingFinalMark(latest, a.i) - speakingFinalMark(latest, b.i))[0];
+    if (low) tip = `<div class="ai-box"><strong>Speaking tip (Q${low.i + 1}):</strong> ${esc(low.r.feedback)}</div>`;
+
+    // trend across attempts
+    const trend = mine.length > 1 ? `<h3 style="margin-top: 18px;">Your progress</h3>
+      <div class="dash-trend">${mine.map((x, i) => `<div class="dash-col"><div class="dash-colbar" style="height: ${Math.max(4, overallPercent(x))}px;"></div><span>${overallPercent(x)}%</span><small>Test ${i + 1}</small></div>`).join('')}</div>` : '';
+
+    box.innerHTML = `
+      <div class="card-box" style="display: flex; flex-wrap: wrap; gap: 18px; align-items: center;">
+        <div class="dash-ring" style="background: conic-gradient(#4f46e5 ${overall * 3.6}deg, #e2e8f0 0);"><span>${overall}%</span><small>Overall</small></div>
+        <div style="flex: 1; min-width: 220px;">
+          <p style="margin: 0 0 4px;"><strong>Latest test:</strong> ${esc(latest.timestamp)}</p>
+          <p style="margin: 0 0 4px;"><strong>Tests taken:</strong> ${mine.length}</p>
+          ${change ? `<p style="margin: 0;">${change}</p>` : ''}
+        </div>
+      </div>
+      <h3 style="margin-top: 18px;">Skills</h3>
+      ${bar('Listening', p.lis, avg && avg.lis)}${bar('Speaking', p.spk, avg && avg.spk)}${bar('Reading', p.read, avg && avg.read)}${bar('Writing', p.wri, avg && avg.wri)}
+      ${avg ? '<p class="small-note">The thin marker on each bar shows your class average.</p>' : ''}
+      ${latest.teacherComment ? `<div class="ai-box"><strong>Teacher's comment:</strong> ${esc(latest.teacherComment)}</div>` : ''}
+      ${focus}${tip}${trend}`;
+  }
+
+  function backToReady() {
+    if (currentStudentSession) showReady();
+    else switchMode('student');
+  }
+
+  function startStudentSession() {
+    currentStudentSession = createNewStudentSession();
+    currentStudentSession.name = document.getElementById('student-name').value;
+    currentStudentSession.class = document.getElementById('student-class').value;
+    currentStudentSession.roll = document.getElementById('student-roll').value;
+
+    document.getElementById('student-info-display').innerText = `${currentStudentSession.name} | Class: ${currentStudentSession.class} | Roll: ${currentStudentSession.roll}`;
+    showReady();
+  }
+
+  function openStartConfirm() {
+    const m = k => Math.round(TIMER_CONFIG[k] / 60);
+    document.getElementById('start-confirm-times').innerHTML =
+      `<li>Listening: ${m('listening')} minutes</li><li>Speaking: ${m('speaking')} minutes</li><li>Reading: ${m('reading')} minutes</li><li>Writing: ${m('writing')} minutes</li>`;
+    document.getElementById('start-confirm').classList.add('open');
+  }
+
+  function closeStartConfirm() {
+    document.getElementById('start-confirm').classList.remove('open');
+  }
+
+  function confirmStartTest() {
+    closeStartConfirm();
+    if (!currentStudentSession || currentStudentSession.finished) return;
+    document.getElementById('timer-display').style.display = 'block';
+    renderListeningQuestions();
+    showSection('sec-listening');
+    startTimer(TIMER_CONFIG.listening, () => submitListeningSection());
+  }
+
+  // 1. Listening Section
+  function renderListeningQuestions() {
+    const container = document.getElementById('listening-container');
+    container.innerHTML = listeningQuestions.map(item => `
+      <div class="question-block">
+        <div class="img-illustration">${item.svg}</div>
+        <p class="question-title">Listening Track ${item.id}</p>
+        <button class="btn" style="padding: 4px 10px; font-size: 0.8rem; margin-bottom: 8px;" onclick="playSynthesizedSample(${item.id})">▶ Play Audio Track #${item.id}</button> <span class="small-note" id="lis-plays-${item.id}">${MAX_LISTEN_PLAYS} plays left</span>
+        <p style="font-weight: 600; margin-top: 6px;">${esc(item.q)}</p>
+        ${item.options.map(opt => `
+          <label class="option-label">
+            <input type="radio" name="lis_q_${item.id}" value="${esc(opt)}" onchange="checkListeningRealtime(${item.id}, this.value)">
+            ${esc(opt)}
+          </label>
+        `).join('')}
+        <div id="lis-fb-${item.id}" class="realtime-feedback"></div>
+      </div>
+    `).join('');
+  }
+
+  function checkListeningRealtime(id, selected) {
+    currentStudentSession.listeningAnswers[id - 1] = selected;
+    
+    // Lock choices for this question
+    const radios = document.querySelectorAll(`input[name="lis_q_${id}"]`);
+    radios.forEach(r => r.disabled = true);
+
+    const fb = document.getElementById(`lis-fb-${id}`);
+    fb.style.display = 'block';
+
+    fb.className = 'realtime-feedback saved';
+    fb.innerText = 'Answer saved.';
+  }
+
+  function submitListeningSection() {
+    clearInterval(timerInterval);
+    let score = 0;
+    listeningQuestions.forEach(item => {
+      const selected = currentStudentSession.listeningAnswers[item.id - 1];
+      if (selected === item.correct) score++;
+    });
+
+    currentStudentSession.listeningScore = score;
+    const pct = (score / listeningQuestions.length) * 100;
+    document.getElementById('listening-score-text').innerText = 'Listening section submitted';
+    document.getElementById('listening-feedback-text').innerText = 'Your answers are saved. Your teacher will share your marks later.';
+
+    showSection('card-listening');
+  }
+
+  // 2. Speaking Section
+  function startSpeakingSection() {
+    spkIndex = 0;
+    spkActive = true;
+    spkStream = null;
+    document.getElementById('spk-prep-label').innerText = SPEAKING_PREP_SECONDS;
+    showSection('sec-speaking');
+    startTimer(TIMER_CONFIG.speaking, () => submitSpeakingSection());
+    openMicrophoneThenAsk();
+  }
+
+  let spkIndex = 0, spkActive = false, spkStream = null, spkRecorder = null, spkChunks = [];
+  let spkRecognition = null, spkRecognizing = false, spkRestarts = 0, spkTranscript = '';
+  let spkCountdown = null, spkAdvance = true, spkRecogFailed = false;
+
+  function spkStage(html) {
+    document.getElementById('speaking-container').innerHTML = html;
+  }
+
+  function openMicrophoneThenAsk() {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || typeof MediaRecorder === 'undefined') {
+      spkStage('<div class="question-block"><p style="color: var(--danger); font-weight: 600;">This browser cannot record audio. Please use Chrome or Edge, and open this page from a web address that starts with https:// or from localhost.</p></div>');
+      return;
+    }
+    spkStage('<div class="question-block"><p>Please click <strong>Allow</strong> when the browser asks for the microphone...</p></div>');
+    navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
+      if (!spkActive) { stream.getTracks().forEach(t => t.stop()); return; }
+      spkStream = stream;
+      askSpeakingQuestion();
+    }).catch(() => {
+      spkStage('<div class="question-block"><p style="color: var(--danger); font-weight: 600;">The microphone is blocked or not found. Check that it is plugged in and allowed for this page, then try again.</p><button class="btn" onclick="openMicrophoneThenAsk()">Try Again</button></div>');
+    });
+  }
+
+  function askSpeakingQuestion() {
+    if (!spkActive) return;
+    if (spkIndex >= speakingPrompts.length) { submitSpeakingSection(); return; }
+    let left = SPEAKING_PREP_SECONDS;
+    const draw = () => {
+      spkStage(`
+        <div class="question-block">
+          <p class="small-note">Question ${spkIndex + 1} of ${speakingPrompts.length}</p>
+          <p class="question-title" style="font-size: 1.2rem;">${esc(speakingPrompts[spkIndex])}</p>
+          <p>Get ready. Recording starts in</p>
+          <div class="spk-count">${left}</div>
+          <button class="btn" onclick="beginRecordingNow()">Start Now</button>
+        </div>`);
+    };
+    draw();
+    clearInterval(spkCountdown);
+    spkCountdown = setInterval(() => {
+      left--;
+      if (left <= 0) { clearInterval(spkCountdown); beginRecordingNow(); }
+      else draw();
+    }, 1000);
+  }
+
+  function beginRecordingNow() {
+    if (!spkActive || !spkStream || (spkRecorder && spkRecorder.state === 'recording')) return;
+    clearInterval(spkCountdown);
+    spkChunks = [];
+    spkTranscript = '';
+    spkAdvance = true;
+    const idx = spkIndex;
+
+    let mime = '';
+    ['audio/webm;codecs=opus', 'audio/webm', 'audio/mp4', 'audio/ogg'].some(t => {
+      if (window.MediaRecorder && MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported(t)) { mime = t; return true; }
+      return false;
+    });
+    try {
+      spkRecorder = mime ? new MediaRecorder(spkStream, { mimeType: mime }) : new MediaRecorder(spkStream);
+    } catch (e) {
+      spkStage('<div class="question-block"><p style="color: var(--danger);">Recording could not start. Tell your teacher.</p></div>');
+      return;
+    }
+    spkRecorder.ondataavailable = e => { if (e.data && e.data.size) spkChunks.push(e.data); };
+    spkRecorder.onstop = () => finishSpeakingAnswer(idx);
+    spkRecorder.start();
+    startRecognition();
+
+    let left = SPEAKING_MAX_SECONDS;
+    const draw = () => {
+      spkStage(`
+        <div class="question-block">
+          <p class="small-note">Question ${idx + 1} of ${speakingPrompts.length}</p>
+          <p class="question-title" style="font-size: 1.2rem;">${esc(speakingPrompts[idx])}</p>
+          <div class="rec-live">● Recording... ${left}s left</div>
+          <button class="btn" style="background-color: var(--danger);" onclick="stopRecordingNow()">Stop</button>
+        </div>`);
+    };
+    draw();
+    spkCountdown = setInterval(() => {
+      left--;
+      if (left <= 0) { stopRecordingNow(); } else draw();
+    }, 1000);
+  }
+
+  function startRecognition() {
+    spkRecognizing = false;
+    spkRestarts = 0;
+    spkRecogFailed = false;
+    if (!SpeechRecognitionCtor) return;
+    let finalText = '';
+    const rec = new SpeechRecognitionCtor();
+    rec.lang = 'en-IN';
+    rec.continuous = true;
+    rec.interimResults = true;
+    rec.onresult = e => {
+      let interim = '';
+      for (let i = e.resultIndex; i < e.results.length; i++) {
+        if (e.results[i].isFinal) finalText += e.results[i][0].transcript + ' ';
+        else interim += e.results[i][0].transcript;
+      }
+      spkTranscript = (finalText + interim).trim();
+    };
+    rec.onerror = e => {
+      // no-speech and aborted are normal while the student thinks; these mean the service itself is unavailable
+      if (['network', 'not-allowed', 'service-not-allowed', 'audio-capture'].includes(e.error)) spkRecogFailed = true;
+    };
+    rec.onend = () => {
+      if (spkRecognizing && spkRestarts < 30) { spkRestarts++; try { rec.start(); } catch (e) {} }
+    };
+    spkRecognition = rec;
+    spkRecognizing = true;
+    try { rec.start(); } catch (e) { spkRecognizing = false; }
+  }
+
+  function stopRecordingNow() {
+    clearInterval(spkCountdown);
+    if (spkRecorder && spkRecorder.state === 'recording') {
+      spkStage('<div class="question-block"><p>Saving your answer...</p></div>');
+      // let the recogniser deliver its last words before closing
+      setTimeout(() => {
+        spkRecognizing = false;
+        try { if (spkRecognition) spkRecognition.stop(); } catch (e) {}
+        if (spkRecorder && spkRecorder.state === 'recording') spkRecorder.stop();
+      }, 700);
+    }
+  }
+
+  function finishSpeakingAnswer(idx) {
+    const s = currentStudentSession;
+    if (!s) return;
+    const blob = new Blob(spkChunks, { type: (spkRecorder && spkRecorder.mimeType) || 'audio/webm' });
+    const transcript = spkTranscript;
+    const recogFailed = spkRecogFailed;
+    s.speakingState[idx] = true;
+    s.speakingResults[idx] = { transcript: transcript, score: null, feedback: '', method: 'pending', override: null };
+
+    const clipSaved = saveClip(s.id + '_' + idx, blob);
+    const scored = Promise.all([clipSaved, scoreSpeakingAnswer(idx, transcript, recogFailed)]).then(([, r]) => {
+      s.speakingResults[idx] = { transcript: transcript, score: r.score, feedback: r.feedback, method: r.method, override: null };
+    });
+    pendingScorePromises.push(scored);
+
+    if (spkActive) {
+      spkStage('<div class="question-block"><p style="color: var(--success); font-weight: 600;">✓ Answer saved.</p></div>');
+      spkIndex = idx + 1;
+      setTimeout(askSpeakingQuestion, 1200);
+    }
+  }
+
+  function submitSpeakingSection() {
+    clearInterval(timerInterval);
+    clearInterval(spkCountdown);
+    spkActive = false;
+    spkRecognizing = false;
+    try { if (spkRecognition) spkRecognition.stop(); } catch (e) {}
+    if (spkRecorder && spkRecorder.state === 'recording') { try { spkRecorder.stop(); } catch (e) {} }
+    setTimeout(() => { if (spkStream) { spkStream.getTracks().forEach(t => t.stop()); spkStream = null; } }, 300);
+
+    const count = currentStudentSession.speakingState.filter(Boolean).length;
+    document.getElementById('speaking-score-text').innerText = `Answers recorded: ${count}/${speakingPrompts.length}`;
+    document.getElementById('speaking-feedback-text').innerText = "Your answers are saved. Your teacher will share your marks later.";
+
+    showSection('card-speaking');
+  }
+
+  // 3. Reading Section
+  function startReadingSection() {
+    renderReadingQuestions();
+    showSection('sec-reading');
+    startTimer(TIMER_CONFIG.reading, () => submitReadingSection());
+  }
+
+  function renderReadingQuestions() {
+    const container = document.getElementById('reading-container');
+    container.innerHTML = readingQuestions.map(item => `
+      <div class="question-block">
+        <p style="font-size: 0.85rem; font-style: italic; color: #475569; margin-bottom: 6px; background: #fff; padding: 6px; border-radius: 4px; border-left: 3px solid var(--primary);">${esc(item.passage)}</p>
+        <p class="question-title">Reading Q${item.id}: ${esc(item.q)}</p>
+        ${item.options.map(opt => `
+          <label class="option-label">
+            <input type="radio" name="read_q_${item.id}" value="${esc(opt)}" onchange="checkReadingRealtime(${item.id}, this.value)">
+            ${esc(opt)}
+          </label>
+        `).join('')}
+        <div id="read-fb-${item.id}" class="realtime-feedback"></div>
+      </div>
+    `).join('');
+  }
+
+  function checkReadingRealtime(id, selected) {
+    currentStudentSession.readingAnswers[id - 1] = selected;
+
+    const radios = document.querySelectorAll(`input[name="read_q_${id}"]`);
+    radios.forEach(r => r.disabled = true);
+
+    const fb = document.getElementById(`read-fb-${id}`);
+    fb.style.display = 'block';
+
+    fb.className = 'realtime-feedback saved';
+    fb.innerText = 'Answer saved.';
+  }
+
+  function submitReadingSection() {
+    clearInterval(timerInterval);
+    let score = 0;
+    readingQuestions.forEach(item => {
+      const selected = currentStudentSession.readingAnswers[item.id - 1];
+      if (selected === item.correct) score++;
+    });
+
+    currentStudentSession.readingScore = score;
+    const pct = (score / readingQuestions.length) * 100;
+    document.getElementById('reading-score-text').innerText = 'Reading section submitted';
+    document.getElementById('reading-feedback-text').innerText = 'Your answers are saved. Your teacher will share your marks later.';
+
+    showSection('card-reading');
+  }
+
+  // 4. Writing Section (3 Prompts - Blank or short responses accepted)
+  function startWritingSection() {
+    renderWritingPrompts();
+    showSection('sec-writing');
+    startTimer(TIMER_CONFIG.writing, () => submitWritingSection());
+  }
+
+  function renderWritingPrompts() {
+    const container = document.getElementById('writing-container');
+    container.innerHTML = writingPrompts.map((prompt, idx) => `
+      <div class="question-block">
+        <p class="question-title">${esc(prompt)}</p>
+        <textarea id="w-input-${idx}" placeholder="Write 4-5 lines here (blank entries allowed)..." oninput="updateWritingCount(${idx})"></textarea>
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 4px;">Words: <span id="w-count-${idx}">0</span></p>
+          <div id="w-lock-${idx}" class="badge-locked" style="display: none;">LOCKED & SUBMITTED</div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function updateWritingCount(index) {
+    const txt = document.getElementById(`w-input-${index}`).value.trim();
+    const count = txt ? txt.split(/\s+/).length : 0;
+    document.getElementById(`w-count-${index}`).innerText = count;
+  }
+
+  function submitWritingSection() {
+    clearInterval(timerInterval);
+
+    writingPrompts.forEach((_, idx) => {
+      const field = document.getElementById(`w-input-${idx}`);
+      const lockBadge = document.getElementById(`w-lock-${idx}`);
+      
+      if (field) {
+        field.readOnly = true;
+        const val = field.value || '';
+        const count = val.trim() ? val.trim().split(/\s+/).length : 0;
+        currentStudentSession.writingResponses[idx] = val;
+        currentStudentSession.writingWordCounts[idx] = count;
+      }
+      if (lockBadge) lockBadge.style.display = 'inline-block';
+    });
+
+    const submitBtn = document.getElementById('submit-writing-btn');
+    if (submitBtn) submitBtn.disabled = true;
+
+    const totalWords = currentStudentSession.writingWordCounts.reduce((a, b) => a + b, 0);
+    document.getElementById('writing-score-text').innerText = `Total Words Written: ${totalWords}`;
+    document.getElementById('writing-feedback-text').innerText = "Writing responses locked and saved to database.";
+
+    currentStudentSession.finished = true;
+    const finishedSession = currentStudentSession;
+    Promise.allSettled(pendingScorePromises.splice(0)).then(() => {
+      saveToSubmissionDatabase(JSON.parse(JSON.stringify(finishedSession)));
+    });
+
+    showSection('card-writing');
+  }
+
+  // Final Report Card & Download
+  function showFinalReportCard(savedSession) {
+    const s = savedSession || currentStudentSession;
+    document.getElementById('module-title').innerText = "Official A2 Answer Script & Report";
+    document.getElementById('timer-display').innerText = "00:00";
+    document.getElementById('student-info-display').innerText = `${s.name} | Class: ${s.class} | Roll: ${s.roll}`;
+
+    const released = resultsReleased(s);
+    document.getElementById('report-pending').style.display = released ? 'none' : 'block';
+    document.getElementById('report-details').style.display = released ? 'block' : 'none';
+    showSection('sec-report-card');
+    document.getElementById('report-back').style.display = currentStudentSession ? 'inline-block' : 'none';
+    if (!released) return;
+
+    const lisPct = Math.round((s.listeningScore / lisN(s)) * 100);
+    const readPct = Math.round((s.readingScore / readN(s)) * 100);
+    const spkN = spkQs(s).length;
+    const spkTot = speakingTotal(s);
+    const spkPct = Math.round((spkTot / spkN) * 100);
+    const wGraded = writingGraded(s);
+    const wMax = wriQs(s).length * WRITING_MAX_MARKS;
+    const wrtPct = wGraded ? Math.round((writingTotal(s) / wMax) * 100) : 0;
+
+    document.getElementById('rep-listening-raw').innerText = `${s.listeningScore} / ${lisN(s)}`;
+    document.getElementById('rep-listening-pct').innerText = `${lisPct}%`;
+    document.getElementById('rep-speaking-raw').innerText = `${spkTot} / ${spkN}`;
+    document.getElementById('rep-speaking-pct').innerText = `${spkPct}%`;
+    document.getElementById('rep-reading-raw').innerText = `${s.readingScore} / ${readN(s)}`;
+    document.getElementById('rep-reading-pct').innerText = `${readPct}%`;
+    document.getElementById('rep-writing-raw').innerText = wGraded ? `${writingTotal(s)} / ${wMax}` : 'Awaiting teacher marks';
+    document.getElementById('rep-writing-pct').innerText = wGraded ? `${wrtPct}%` : '--';
+
+    const cbox = document.getElementById('rep-comment-box');
+    cbox.style.display = s.teacherComment ? 'block' : 'none';
+    cbox.innerHTML = s.teacherComment ? `<strong>Teacher's comment:</strong> ${esc(s.teacherComment)}` : '';
+    document.getElementById('rep-speaking-feedback').innerHTML = spkQs(s).map((p, i) => {
+      const r = (s.speakingResults || [])[i];
+      const fb = r && r.feedback ? r.feedback : (r ? 'Your answer was recorded.' : 'No answer recorded.');
+      return `<div style="margin-bottom: 8px; padding: 8px; background: #f8fafc; border-left: 3px solid var(--primary);">
+        <p style="font-weight: 600; font-size: 0.85rem;">Q${i + 1}: ${esc(p)}</p>
+        <p style="font-size: 0.85rem;">Marks: <strong>${speakingFinalMark(s, i)} / 1</strong> &nbsp;|&nbsp; ${esc(fb)}</p>
+      </div>`;
+    }).join('');
+
+    document.getElementById('rep-writing-archive').innerHTML = wriQs(s).map((p, idx) => `
+      <div style="margin-bottom: 12px; padding: 10px; background: #f8fafc; border-left: 3px solid var(--primary);">
+        <p style="font-weight: 600; font-size: 0.85rem;">${esc(p)}</p>
+        <p style="font-size: 0.9rem; margin-top: 4px; font-style: italic;">"${esc(s.writingResponses[idx] || '[Blank Response]')}"</p>
+        <p style="font-size: 0.85rem; margin-top: 4px;">Marks: ${(s.writingMarks && s.writingMarks[idx] !== null && s.writingMarks[idx] !== undefined && s.writingMarks[idx] !== '') ? s.writingMarks[idx] + ' / ' + WRITING_MAX_MARKS : 'pending'}</p>
+      </div>
+    `).join('');
+
+    drawPerformanceChart([lisPct, spkPct, readPct, wrtPct]);
+  }
+
+  // Student comes back later and looks up the released result
+  function viewMyResults() {
+    const name = document.getElementById('student-name').value.trim().toLowerCase();
+    const cls = document.getElementById('student-class').value.trim().toLowerCase();
+    const roll = document.getElementById('student-roll').value.trim().toLowerCase();
+    if (!name || !cls || !roll) { alert('Enter your name, class and roll number first.'); return; }
+    const matches = getSubmissionDatabase().filter(x => (x.name || '').trim().toLowerCase() === name && (x.class || '').trim().toLowerCase() === cls && (x.roll || '').trim().toLowerCase() === roll);
+    if (!matches.length) { alert('No submission found for these details.'); return; }
+    const lastSub = matches[matches.length - 1];
+    if (!resultsReleased(lastSub)) { alert('Your teacher has not shared the results yet.'); return; }
+    showFinalReportCard(lastSub);
+  }
+
+  function resetForNextStudent() {
+    currentStudentSession = null;
+    document.getElementById('student-name').value = '';
+    document.getElementById('student-class').value = '';
+    document.getElementById('student-roll').value = '';
+    document.getElementById('student-info-display').innerText = 'Please Login to Begin';
+    document.getElementById('timer-display').style.display = 'none';
+
+    switchMode('student');
+  }
+
+  function drawPerformanceChart(data) {
+    const canvas = document.getElementById('performanceChart');
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    const labels = ['Listening', 'Speaking', 'Reading', 'Writing'];
+    const colors = ['#2563eb', '#0284c7', '#d97706', '#9333ea'];
+    const barWidth = 50;
+    const gap = 35;
+    const startX = 40;
+    const chartHeight = 160;
+
+    ctx.beginPath();
+    ctx.moveTo(startX - 10, 20);
+    ctx.lineTo(startX - 10, 180);
+    ctx.lineTo(380, 180);
+    ctx.strokeStyle = '#cbd5e1';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    data.forEach((val, idx) => {
+      const h = (val / 100) * chartHeight;
+      const x = startX + idx * (barWidth + gap);
+      const y = 180 - h;
+
+      ctx.fillStyle = colors[idx];
+      ctx.fillRect(x, y, barWidth, h);
+
+      ctx.fillStyle = '#0f172a';
+      ctx.font = 'bold 12px sans-serif';
+      ctx.fillText(`${val}%`, x + 10, y - 6);
+
+      ctx.font = '11px sans-serif';
+      ctx.fillText(labels[idx], x, 198);
+    });
+  }
+
+  function sessionCsvRows(session) {
+    const spkTot = speakingTotal(session);
+    const wMax = wriQs(session).length * WRITING_MAX_MARKS;
+    const spkN = spkQs(session).length;
+    return [
+      ['A2 CEFR ANSWER SCRIPT & ASSESSMENT RECORD'],
+      ['Student Name', session.name],
+      ['Class', session.class],
+      ['Roll No', session.roll],
+      ['Timestamp', session.timestamp],
+      [],
+      ['Skill Section', 'Questions/Prompts', 'Score / Metric', 'Percentage'],
+      ['Listening', `${lisN(session)} Questions`, `${session.listeningScore}/${lisN(session)}`, `${Math.round((session.listeningScore / lisN(session)) * 100)}%`],
+      ['Speaking', `${spkN} Questions`, `${spkTot}/${spkN}`, `${Math.round((spkTot / spkN) * 100)}%`],
+      ['Reading', `${readN(session)} Questions`, `${session.readingScore}/${readN(session)}`, `${Math.round((session.readingScore / readN(session)) * 100)}%`],
+      ['Writing', `${wriQs(session).length} Prompts`, writingGraded(session) ? `${writingTotal(session)}/${wMax}` : 'Not marked yet', writingGraded(session) ? `${Math.round((writingTotal(session) / wMax) * 100)}%` : ''],
+      ['Teacher comment', session.teacherComment || ''],
+      [],
+      ['SPEAKING'],
+      ['Question', 'Transcript', 'Auto mark', 'Teacher override', 'Final mark', 'Feedback'],
+      ...spkQs(session).map((p, i) => {
+        const r = (session.speakingResults || [])[i] || {};
+        return [p, r.transcript || '', r.score === null || r.score === undefined ? '' : r.score, r.override === null || r.override === undefined ? '' : r.override, speakingFinalMark(session, i), r.feedback || ''];
+      }),
+      [],
+      ['WRITING ANSWER SCRIPT'],
+      ['Prompt', 'Answer', 'Words', 'Marks'],
+      ...wriQs(session).map((p, i) => [p, session.writingResponses[i] || '[Blank Response]', session.writingWordCounts[i] || 0, (session.writingMarks && session.writingMarks[i] !== null && session.writingMarks[i] !== undefined) ? session.writingMarks[i] : ''])
+    ];
+  }
+
+  function exportStudentCSV(session) {
+    const safeName = String(session.name || 'Student').replace(/[^\w\- ]+/g, '_');
+    downloadCSV(sessionCsvRows(session), `A2_AnswerScript_${safeName}.csv`);
+  }
+
+  function exportAllResults() {
+    const all = getSubmissionDatabase();
+    const db = filteredSubmissionIndexes(all).map(i => all[i]);
+    if (!db.length) { alert('No submissions to export (check the date and class filters).'); return; }
+    const rows = [['Name', 'Class', 'Roll', 'Submitted', 'Listening marks', 'Listening out of', 'Speaking marks', 'Speaking out of', 'Reading marks', 'Reading out of', 'Writing marks', 'Writing out of', 'Teacher checked']];
+    db.forEach(s => rows.push([s.name, s.class, s.roll, s.timestamp, s.listeningScore, lisN(s), speakingTotal(s), spkQs(s).length, s.readingScore, readN(s), writingGraded(s) ? writingTotal(s) : 'not marked', wriQs(s).length * WRITING_MAX_MARKS, s.isGraded ? 'yes' : 'no']));
+    downloadCSV(rows, 'A2_All_Results.csv');
+  }
+
+  /* ---------------- TEACHER WORKFLOW ---------------- */
+  /* ---------------- TEACHER PORTAL (home + five tools) ---------------- */
+  const T_SCREENS = { home: 'sec-t-home', dash: 'sec-t-dash', mark: 'sec-t-mark', qa: 'sec-t-qa', students: 'sec-t-students', results: 'sec-t-results', bank: 'sec-t-bank' };
+  const T_TITLES = { dash: 'Class Dashboard', mark: 'Marking', qa: 'Question Analysis', students: 'Students', results: 'Results & Sharing', bank: 'Question Bank' };
+  const COMMENT_CHIPS = ['Well done!', 'Good effort.', 'Excellent work.', 'Check spelling and grammar.', 'Speak in full sentences.', 'Practise listening carefully.', 'Read the question again before answering.', 'Needs more practice.'];
+  let teacherScreen = 'home';
+
+  function authenticateTeacher() {
+    const pass = document.getElementById('teacher-pass').value;
+    if (pass === TEACHER_PASSWORD) {
+      document.getElementById('teacher-pass').value = '';
+      showTeacherScreen('home');
+    } else {
+      alert("Invalid teacher password!");
+    }
+  }
+
+  function teacherLogout() {
+    document.getElementById('teacher-filter-bar').style.display = 'none';
+    switchMode('teacher');
+  }
+
+  function showTeacherScreen(name) {
+    teacherScreen = name;
+    showSection(T_SCREENS[name]);
+    document.getElementById('module-title').innerText = 'Instructor Portal' + (T_TITLES[name] ? ' - ' + T_TITLES[name] : '');
+    document.getElementById('student-info-display').innerText = 'Teacher view';
+    document.getElementById('timer-display').style.display = 'none';
+    document.getElementById('teacher-filter-bar').style.display = ['dash', 'mark', 'qa', 'students', 'results'].includes(name) ? 'block' : 'none';
+    if (name === 'home') renderTeacherHome();
+    else if (name === 'bank') refreshCountsText();
+    else refreshTeacherScreen();
+  }
+
+  function refreshTeacherScreen() {
+    buildClassFilter();
+    if (teacherScreen === 'dash') renderTeacherDash();
+    else if (teacherScreen === 'mark') populateTeacherDropdown();
+    else if (teacherScreen === 'qa') renderQuestionAnalysis();
+    else if (teacherScreen === 'students') renderStudents();
+    else if (teacherScreen === 'results') renderResultsSharing();
+  }
+
+  /* ----- shared helpers ----- */
+  function studentKey(s) {
+    const n = x => String(x || '').trim().toLowerCase();
+    return n(s.name) + '|' + n(s.class) + '|' + n(s.roll);
+  }
+
+  // Date of a submission as yyyy-mm-dd (read from its id, which holds the time it was created)
+  function submissionDate(sub) {
+    const m = /^SCRIPT_(\d{10,})_/.exec(sub.id || '');
+    const d = m ? new Date(Number(m[1])) : new Date(sub.timestamp);
+    if (isNaN(d)) return '';
+    const p = n => String(n).padStart(2, '0');
+    return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
+  }
+
+  function needsMarking(s) {
+    const speakingOpen = (s.speakingResults || []).some(r => r && (r.score === null || r.score === undefined) && (r.override === null || r.override === undefined));
+    return !writingGraded(s) || speakingOpen;
+  }
+
+  function buildClassFilter() {
+    const sel = document.getElementById('filter-class');
+    const chosen = sel.value;
+    const classes = new Map();
+    getSubmissionDatabase().forEach(s => { const k = String(s.class || '').trim().toLowerCase(); if (k && !classes.has(k)) classes.set(k, String(s.class).trim()); });
+    sel.innerHTML = '<option value="">All classes</option>' + [...classes.entries()].sort((a, b) => a[1].localeCompare(b[1], undefined, { numeric: true })).map(([k, label]) => `<option value="${esc(k)}">${esc(label)}</option>`).join('');
+    sel.value = classes.has(chosen) ? chosen : '';
+  }
+
+  function clearTeacherFilters() {
+    document.getElementById('filter-date').value = '';
+    document.getElementById('filter-class').value = '';
+    refreshTeacherScreen();
+  }
+
+  // Indexes (in the saved list) of the submissions that match the date and class filters
+  function filteredSubmissionIndexes(db) {
+    const date = document.getElementById('filter-date').value;
+    const cls = document.getElementById('filter-class').value;
+    const out = [];
+    db.forEach((sub, idx) => {
+      if (date && submissionDate(sub) !== date) return;
+      if (cls && String(sub.class || '').trim().toLowerCase() !== cls) return;
+      out.push(idx);
+    });
+    return out;
+  }
+
+  function filteredEntries() {
+    const db = getSubmissionDatabase();
+    return { db: db, entries: filteredSubmissionIndexes(db).map(i => ({ sub: db[i], idx: i })) };
+  }
+
+  function latestEntries(entries) {
+    const m = new Map();
+    entries.forEach(e => m.set(studentKey(e.sub), e));
+    return [...m.values()];
+  }
+
+  function updateFilterCount(shown, total) {
+    document.getElementById('filter-count').innerText = total ? `Showing ${shown} of ${total} submissions` : '';
+  }
+
+  function emptyNote(text) { return `<div class="card-box"><p>${esc(text)}</p></div>`; }
+
+  function pctClass(p) { return p >= 70 ? 'good' : (p >= 40 ? 'mid' : 'low'); }
+
+  /* ----- release model (all / by class / by student) ----- */
+  function getRelease() {
+    const blank = { all: false, classes: [], students: [] };
+    try {
+      const v = localStorage.getItem(RELEASE_STORAGE);
+      if (v === '1') return { all: true, classes: [], students: [] };
+      if (!v || v === '0') return blank;
+      const o = JSON.parse(v);
+      return { all: !!o.all, classes: o.classes || [], students: o.students || [] };
+    } catch (e) { return blank; }
+  }
+  function saveRelease(o) { try { localStorage.setItem(RELEASE_STORAGE, JSON.stringify(o)); } catch (e) {} }
+  function resultsReleased(s) {
+    if (!s) return false;
+    const r = getRelease();
+    return r.all || r.classes.includes(String(s.class || '').trim().toLowerCase()) || r.students.includes(studentKey(s));
+  }
+  function setReleaseAll(on) { const r = getRelease(); r.all = on; saveRelease(r); renderResultsSharing(); }
+  function setReleaseClass(k, on) { const r = getRelease(); r.classes = r.classes.filter(x => x !== k); if (on) r.classes.push(k); saveRelease(r); renderResultsSharing(); }
+  function setReleaseStudent(k, on) { const r = getRelease(); r.students = r.students.filter(x => x !== k); if (on) r.students.push(k); saveRelease(r); renderResultsSharing(); }
+  function releaseShown(on) {
+    const r = getRelease();
+    const keys = latestEntries(filteredEntries().entries).map(e => studentKey(e.sub));
+    r.students = r.students.filter(x => !keys.includes(x));
+    if (on) r.students = r.students.concat(keys);
+    saveRelease(r);
+    renderResultsSharing();
+  }
+
+  /* ----- Teacher home ----- */
+  function renderTeacherHome() {
+    const db = getSubmissionDatabase();
+    const students = new Set(db.map(studentKey)).size;
+    const toMark = db.filter(needsMarking).length;
+    document.getElementById('t-home-summary').innerText = db.length
+      ? `${students} student${students === 1 ? '' : 's'} tested, ${db.length} test${db.length === 1 ? '' : 's'} saved, ${toMark} waiting for marks.`
+      : 'No tests saved on this computer yet.';
+    const badge = document.getElementById('t-badge-mark');
+    badge.innerText = toMark ? String(toMark) : '';
+    badge.style.display = toMark ? 'inline-block' : 'none';
+  }
+
+  /* ----- 1. Class dashboard ----- */
+  function renderTeacherDash() {
+    const { db, entries } = filteredEntries();
+    updateFilterCount(entries.length, db.length);
+    const box = document.getElementById('t-dash-content');
+    if (!entries.length) { box.innerHTML = emptyNote(db.length ? 'No submissions match the selected date and class.' : 'No tests saved yet.'); return; }
+    const latest = latestEntries(entries).map(e => e.sub);
+    const toMark = entries.filter(e => needsMarking(e.sub)).length;
+    const avgOf = vals => { const v = vals.filter(x => x !== null); return v.length ? Math.round(v.reduce((a, b) => a + b, 0) / v.length) : null; };
+    const pcts = latest.map(skillPercents);
+    const sk = { lis: avgOf(pcts.map(p => p.lis)), spk: avgOf(pcts.map(p => p.spk)), read: avgOf(pcts.map(p => p.read)), wri: avgOf(pcts.map(p => p.wri)) };
+    const overalls = latest.map(overallPercent);
+    const classAvg = avgOf(overalls);
+
+    const buckets = [['0-39%', 0, 39], ['40-59%', 40, 59], ['60-79%', 60, 79], ['80-100%', 80, 100]].map(([label, lo, hi]) => ({ label, n: overalls.filter(o => o >= lo && o <= hi).length }));
+    const maxN = Math.max(1, ...buckets.map(b => b.n));
+
+    const attention = latest.map((s, i) => ({ s, o: overalls[i], min: Math.min(...[pcts[i].lis, pcts[i].spk, pcts[i].read, pcts[i].wri].filter(x => x !== null)) }))
+      .filter(x => x.o < 40 || x.min < 30).sort((a, b) => a.o - b.o).slice(0, 8);
+    const idxOf = s => { const e = entries.filter(x => studentKey(x.sub) === studentKey(s)); return e[e.length - 1].idx; };
+
+    const byClass = new Map();
+    latest.forEach((s, i) => { const k = String(s.class || '').trim() || '(none)'; if (!byClass.has(k)) byClass.set(k, []); byClass.get(k).push(overalls[i]); });
+    const classRows = [...byClass.entries()].sort((a, b) => a[0].localeCompare(b[0], undefined, { numeric: true }));
+
+    box.innerHTML = `
+      <div class="kpi-row">
+        <div class="kpi"><b>${latest.length}</b><span>Students tested</span></div>
+        <div class="kpi"><b>${entries.length}</b><span>Tests submitted</span></div>
+        <div class="kpi"><b>${classAvg}%</b><span>Average score</span></div>
+        <div class="kpi ${toMark ? 'kpi-warn' : ''}"><b>${toMark}</b><span>Waiting for marks</span></div>
+      </div>
+      <h3 style="margin-top: 18px;">Average by skill</h3>
+      ${bar('Listening', sk.lis, null)}${bar('Speaking', sk.spk, null)}${bar('Reading', sk.read, null)}${bar('Writing', sk.wri, null)}
+      ${(() => { const ranked = [['Listening', sk.lis], ['Speaking', sk.spk], ['Reading', sk.read], ['Writing', sk.wri]].filter(x => x[1] !== null).sort((a, b) => a[1] - b[1]); return ranked.length > 1 && ranked[0][1] !== ranked[ranked.length - 1][1] ? `<p class="small-note">Weakest skill for this group: <strong>${ranked[0][0]}</strong> (${ranked[0][1]}%). Strongest: <strong>${ranked[ranked.length - 1][0]}</strong> (${ranked[ranked.length - 1][1]}%).</p>` : ''; })()}
+      <h3 style="margin-top: 18px;">Score spread</h3>
+      ${buckets.map(b => `<div style="display: flex; align-items: center; gap: 10px; margin: 6px 0;"><span style="width: 74px; font-size: 0.85rem; font-weight: 600;">${b.label}</span><div class="dash-track" style="flex: 1; margin: 0;"><div class="dash-fill" style="width: ${(b.n / maxN) * 100}%;"></div></div><span style="width: 90px; font-size: 0.85rem;">${b.n} student${b.n === 1 ? '' : 's'}</span></div>`).join('')}
+      ${classRows.length > 1 ? `<h3 style="margin-top: 18px;">By class</h3>
+        <table class="report-table"><thead><tr><th>Class</th><th>Students</th><th>Average</th></tr></thead><tbody>${classRows.map(([k, v]) => `<tr><td>${esc(k)}</td><td>${v.length}</td><td>${avgOf(v)}%</td></tr>`).join('')}</tbody></table>` : ''}
+      <h3 style="margin-top: 18px;">Needs attention</h3>
+      ${attention.length ? `<table class="report-table"><thead><tr><th>Student</th><th>Class</th><th>Overall</th><th></th></tr></thead><tbody>${attention.map(x => `<tr><td>${esc(x.s.name)}</td><td>${esc(x.s.class)}</td><td><span class="pill ${pctClass(x.o)}">${x.o}%</span></td><td><button class="btn btn-grey" style="margin: 0; padding: 4px 10px; font-size: 0.8rem;" onclick="openInMarking(${idxOf(x.s)})">Open</button></td></tr>`).join('')}</tbody></table>
+        <p class="small-note">Shown when the overall score is under 40% or any skill is under 30%.</p>` : '<p class="small-note">Nobody is below the attention level. Well done!</p>'}`;
+  }
+
+  function openInMarking(idx) {
+    document.getElementById('only-unmarked').checked = false;
+    showTeacherScreen('mark');
+    let sel = document.getElementById('submission-select');
+    sel.value = String(idx);
+    if (sel.value !== String(idx)) { // hidden by a filter: clear filters and try again
+      document.getElementById('filter-date').value = '';
+      document.getElementById('filter-class').value = '';
+      refreshTeacherScreen();
+      sel = document.getElementById('submission-select');
+      sel.value = String(idx);
+    }
+    loadSelectedStudentScript();
+  }
+
+  /* ----- 2. Marking ----- */
+  function populateTeacherDropdown() {
+    const select = document.getElementById('submission-select');
+    select.innerHTML = '';
+    const { db, entries } = filteredEntries();
+    const onlyUnmarked = document.getElementById('only-unmarked').checked;
+    const shown = entries.filter(e => !onlyUnmarked || needsMarking(e.sub));
+    updateFilterCount(entries.length, db.length);
+    document.getElementById('mark-count').innerText = `${entries.filter(e => needsMarking(e.sub)).length} waiting for marks`;
+
+    if (db.length === 0 || shown.length === 0) {
+      select.innerHTML = `<option value="">${db.length === 0 ? '-- No Student Submissions Found --' : (onlyUnmarked && entries.length ? '-- Everything shown is marked --' : '-- No submissions match these filters --')}</option>`;
+      document.getElementById('teacher-student-meta').innerHTML = `<p>${db.length === 0 ? 'No student submissions recorded yet.' : (onlyUnmarked && entries.length ? 'All done. Nothing is waiting for marks here.' : 'No submissions match the selected date and class.')}</p>`;
+      document.getElementById('teacher-speaking-reviews').innerHTML = '';
+      document.getElementById('teacher-writing-reviews').innerHTML = '';
+      document.getElementById('mark-extras').style.display = 'none';
+      return;
+    }
+    shown.forEach(e => {
+      const opt = document.createElement('option');
+      opt.value = e.idx;
+      opt.innerText = `${needsMarking(e.sub) ? '● ' : '✓ '}${e.sub.name} (Class: ${e.sub.class}, Roll: ${e.sub.roll}) - ${e.sub.timestamp}`;
+      select.appendChild(opt);
+    });
+    loadSelectedStudentScript();
+  }
+
+  function nextUnmarked() {
+    const select = document.getElementById('submission-select');
+    const { entries } = filteredEntries();
+    const open = entries.filter(e => needsMarking(e.sub));
+    const status = document.getElementById('save-status');
+    if (!open.length) { status.style.color = 'var(--success)'; status.innerText = 'All done. Nothing is waiting for marks here.'; return; }
+    const cur = Number(select.value);
+    const next = open.find(e => e.idx > cur) || open[0];
+    document.getElementById('only-unmarked').checked = false;
+    populateTeacherDropdown();
+    select.value = String(next.idx);
+    loadSelectedStudentScript();
+  }
+
+  function loadSelectedStudentScript() {
+    renderStudentScript();
+    const db = getSubmissionDatabase();
+    const sub = db[document.getElementById('submission-select').value];
+    const extras = document.getElementById('mark-extras');
+    if (!sub) { extras.style.display = 'none'; return; }
+    extras.style.display = 'block';
+    document.getElementById('teacher-comment').value = sub.teacherComment || '';
+    document.getElementById('save-status').innerText = '';
+    document.getElementById('comment-chips').innerHTML = COMMENT_CHIPS.map((t, i) => `<button type="button" class="chip" onclick="addCommentChip(${i})">${esc(t)}</button>`).join('');
+  }
+
+  function addCommentChip(i) {
+    const box = document.getElementById('teacher-comment');
+    box.value = (box.value.trim() ? box.value.trim() + ' ' : '') + COMMENT_CHIPS[i];
+  }
+
+  function exportCurrentStudent() {
+    const db = getSubmissionDatabase();
+    const sub = db[document.getElementById('submission-select').value];
+    if (!sub) { alert('No student script selected!'); return; }
+    exportStudentCSV(sub);
+  }
+
+  /* ----- 3. Question analysis ----- */
+  function tally(map, q, answer) {
+    let e = map.get(q.q);
+    if (!e) { e = { q: q.q, correct: q.correct, n: 0, right: 0, blank: 0, wrong: {} }; map.set(q.q, e); }
+    e.n++;
+    if (answer === q.correct) e.right++;
+    else if (!answer) e.blank++;
+    else e.wrong[answer] = (e.wrong[answer] || 0) + 1;
+  }
+
+  function analysisRows(map) {
+    return [...map.values()].map(e => ({ e, pct: Math.round((e.right / e.n) * 100) })).sort((a, b) => a.pct - b.pct).map(({ e, pct }) => {
+      const top = Object.entries(e.wrong).sort((a, b) => b[1] - a[1])[0];
+      return `<div class="question-block" style="padding: 12px 16px;">
+        <p class="question-title" style="margin-bottom: 4px;">${esc(e.q)}</p>
+        <div style="display: flex; justify-content: space-between; font-size: 0.85rem;"><span>${e.right} of ${e.n} correct${e.blank ? `, ${e.blank} left blank` : ''}</span><span class="pill ${pctClass(pct)}">${pct}%</span></div>
+        <div class="dash-track"><div class="dash-fill" style="width: ${pct}%;"></div></div>
+        <p class="small-note" style="margin: 6px 0 0;">Correct answer: <strong>${esc(e.correct)}</strong>${top ? ` &nbsp;|&nbsp; Most chosen wrong answer: <strong>${esc(top[0])}</strong> (${top[1]})` : ''}${pct < 40 && e.n >= 3 ? ' &nbsp;|&nbsp; <span style="color: var(--danger); font-weight: 700;">Check this question or re-teach it</span>' : ''}</p>
+      </div>`;
+    }).join('');
+  }
+
+  function renderQuestionAnalysis() {
+    const { db, entries } = filteredEntries();
+    updateFilterCount(entries.length, db.length);
+    const box = document.getElementById('t-qa-content');
+    if (!entries.length) { box.innerHTML = emptyNote(db.length ? 'No submissions match the selected date and class.' : 'No tests saved yet.'); return; }
+    const L = new Map(), R = new Map(), S = new Map();
+    entries.forEach(({ sub: s }) => {
+      const lq = s.lisQ || (lisN(s) === listeningQuestions.length ? listeningQuestions : null);
+      if (lq) lq.forEach((q, i) => tally(L, q, (s.listeningAnswers || [])[i]));
+      const rq = s.readQ || (readN(s) === readingQuestions.length ? readingQuestions : null);
+      if (rq) rq.forEach((q, i) => tally(R, q, (s.readingAnswers || [])[i]));
+      spkQs(s).forEach((q, i) => {
+        const r = (s.speakingResults || [])[i];
+        if (!r) return;
+        const v = (r.override !== null && r.override !== undefined) ? r.override : r.score;
+        if (v === null || v === undefined) return;
+        const e = S.get(q) || { n: 0, sum: 0 };
+        e.n++; e.sum += Number(v); S.set(q, e);
+      });
+    });
+    const spkRows = [...S.entries()].map(([q, e]) => ({ q, n: e.n, avg: e.sum / e.n })).sort((a, b) => a.avg - b.avg);
+    box.innerHTML = `
+      <p class="small-note">Lowest scores come first. These show which questions were hardest for the students shown.</p>
+      <h3>Listening</h3>${L.size ? analysisRows(L) : emptyNote('No data.')}
+      <h3 style="margin-top: 18px;">Reading</h3>${R.size ? analysisRows(R) : emptyNote('No data.')}
+      <h3 style="margin-top: 18px;">Speaking (average mark out of 1)</h3>
+      ${spkRows.length ? spkRows.map(x => { const p = Math.round(x.avg * 100); return `<div class="question-block" style="padding: 12px 16px;"><p class="question-title" style="margin-bottom: 4px;">${esc(x.q)}</p><div style="display: flex; justify-content: space-between; font-size: 0.85rem;"><span>${x.n} marked answer${x.n === 1 ? '' : 's'}</span><span class="pill ${pctClass(p)}">${x.avg.toFixed(2)} / 1</span></div><div class="dash-track"><div class="dash-fill" style="width: ${p}%;"></div></div></div>`; }).join('') : emptyNote('No marked speaking answers yet.')}`;
+  }
+
+  /* ----- 4. Students ----- */
+  function renderStudents() {
+    const { db, entries } = filteredEntries();
+    updateFilterCount(entries.length, db.length);
+    const box = document.getElementById('t-students-content');
+    const q = (document.getElementById('student-search').value || '').trim().toLowerCase();
+    const groups = new Map();
+    entries.forEach(e => { const k = studentKey(e.sub); if (!groups.has(k)) groups.set(k, []); groups.get(k).push(e); });
+    let list = [...groups.values()].filter(g => !q || String(g[0].sub.name).toLowerCase().includes(q));
+    list.sort((a, b) => String(a[0].sub.name).localeCompare(String(b[0].sub.name)));
+    if (!list.length) { box.innerHTML = emptyNote(entries.length ? 'No student matches this search.' : (db.length ? 'No submissions match the selected date and class.' : 'No tests saved yet.')); return; }
+    box.innerHTML = `<table class="report-table"><thead><tr><th>Student</th><th>Class</th><th>Roll</th><th>Tests</th><th>Latest</th><th>Status</th><th></th></tr></thead><tbody>` + list.map((g, n) => {
+      const last = g[g.length - 1];
+      const o = overallPercent(last.sub);
+      let arrow = '';
+      if (g.length > 1) { const d = o - overallPercent(g[g.length - 2].sub); arrow = d > 0 ? ` <span style="color: var(--success);">▲ ${d}</span>` : (d < 0 ? ` <span style="color: var(--danger);">▼ ${Math.abs(d)}</span>` : ' <span class="small-note">=</span>'); }
+      const open = g.some(e => needsMarking(e.sub));
+      return `<tr>
+        <td>${esc(last.sub.name)}</td><td>${esc(last.sub.class)}</td><td>${esc(last.sub.roll)}</td><td>${g.length}</td>
+        <td><span class="pill ${pctClass(o)}">${o}%</span>${arrow}</td>
+        <td>${open ? '<span class="pill mid">To mark</span>' : '<span class="pill good">Marked</span>'}</td>
+        <td style="white-space: nowrap;">
+          <button class="btn btn-grey" style="margin: 0; padding: 4px 8px; font-size: 0.8rem;" onclick="toggleStudentDetail(${n})">Tests</button>
+          <button class="btn btn-teacher" style="margin: 0; padding: 4px 8px; font-size: 0.8rem;" onclick="openInMarking(${last.idx})">Mark</button>
+          <button class="btn btn-grey" style="margin: 0; padding: 4px 8px; font-size: 0.8rem;" onclick="printStudent(${last.idx})">Print</button>
+        </td></tr>
+        <tr id="stu-detail-${n}" style="display: none;"><td colspan="7" style="background: #f8fafc;">
+          ${g.map((e, i) => { const p = skillPercents(e.sub); return `<div style="font-size: 0.85rem; margin: 4px 0;"><strong>Test ${i + 1}</strong> (${esc(e.sub.timestamp)}): overall ${overallPercent(e.sub)}% | Listening ${p.lis}% | Speaking ${p.spk}% | Reading ${p.read}% | Writing ${p.wri === null ? 'not marked' : p.wri + '%'}${e.sub.teacherComment ? `<br><em>Comment: ${esc(e.sub.teacherComment)}</em>` : ''}</div>`; }).join('')}
+        </td></tr>`;
+    }).join('') + '</tbody></table>';
+  }
+
+  function toggleStudentDetail(n) {
+    const row = document.getElementById('stu-detail-' + n);
+    if (row) row.style.display = row.style.display === 'none' ? 'table-row' : 'none';
+  }
+
+  /* ----- 5. Results & sharing (release + print) ----- */
+  function renderResultsSharing() {
+    const { db, entries } = filteredEntries();
+    updateFilterCount(entries.length, db.length);
+    const rel = getRelease();
+    const latest = latestEntries(entries);
+    const classes = new Map();
+    db.forEach(s => { const k = String(s.class || '').trim().toLowerCase(); if (k && !classes.has(k)) classes.set(k, { label: String(s.class).trim(), keys: new Set() }); if (k) classes.get(k).keys.add(studentKey(s)); });
+    const classRows = [...classes.entries()].sort((a, b) => a[1].label.localeCompare(b[1].label, undefined, { numeric: true }));
+
+    document.getElementById('t-results-content').innerHTML = `
+      <div class="card-box">
+        <label class="option-label"><input type="checkbox" ${rel.all ? 'checked' : ''} onchange="setReleaseAll(this.checked)"> <strong>Release results for everyone</strong></label>
+        <h3 style="margin-top: 12px;">By class</h3>
+        ${classRows.length ? classRows.map(([k, c]) => `<label class="option-label" style="display: inline-block; margin-right: 8px;"><input type="checkbox" data-k="${esc(k)}" ${rel.classes.includes(k) ? 'checked' : ''} ${rel.all ? 'disabled' : ''} onchange="setReleaseClass(this.dataset.k, this.checked)"> ${esc(c.label)} (${c.keys.size})</label>`).join('') : '<p class="small-note">No classes yet.</p>'}
+        <p class="small-note">Students see their marks, feedback and dashboard only after their result is released.</p>
+      </div>
+      <h3 style="margin-top: 18px;">By student (${latest.length} shown)</h3>
+      <div style="margin-bottom: 8px;">
+        <button class="btn btn-teacher" style="margin: 0;" onclick="releaseShown(true)">Release for students shown</button>
+        <button class="btn btn-grey" style="margin: 0;" onclick="releaseShown(false)">Hide for students shown</button>
+      </div>
+      ${latest.length ? `<table class="report-table"><thead><tr><th>Released</th><th>Student</th><th>Class</th><th>Roll</th><th>Status</th></tr></thead><tbody>${latest.map(e => {
+        const k = studentKey(e.sub);
+        const own = rel.students.includes(k);
+        const via = rel.all ? 'everyone' : (rel.classes.includes(String(e.sub.class || '').trim().toLowerCase()) ? 'class' : '');
+        return `<tr><td><input type="checkbox" data-k="${esc(k)}" ${own || via ? 'checked' : ''} ${via ? 'disabled' : ''} onchange="setReleaseStudent(this.dataset.k, this.checked)"></td><td>${esc(e.sub.name)}</td><td>${esc(e.sub.class)}</td><td>${esc(e.sub.roll)}</td><td>${via ? `<span class="pill good">Released (${via})</span>` : (own ? '<span class="pill good">Released</span>' : '<span class="pill mid">Hidden</span>')}${needsMarking(e.sub) ? ' <span class="small-note">(not fully marked)</span>' : ''}</td></tr>`;
+      }).join('')}</tbody></table>` : emptyNote(db.length ? 'No submissions match the selected date and class.' : 'No tests saved yet.')}
+      <div style="margin-top: 14px;">
+        <button class="btn" onclick="printShown()">Print report cards (students shown)</button>
+        <button class="btn btn-grey" onclick="exportAllResults()">Export students shown (CSV)</button>
+      </div>`;
+  }
+
+  /* ----- printing ----- */
+  function reportCardHtml(s) {
+    const p = skillPercents(s);
+    const wMax = wriQs(s).length * WRITING_MAX_MARKS;
+    const row = (label, got, out, pct) => `<tr><td>${label}</td><td>${got}</td><td>${out}</td><td>${pct === null ? '-' : pct + '%'}</td></tr>`;
+    const spk = spkQs(s).map((q, i) => { const r = (s.speakingResults || [])[i]; return `<tr><td>${esc(q)}</td><td>${speakingFinalMark(s, i)} / 1</td><td>${esc(r && r.feedback ? r.feedback : '')}</td></tr>`; }).join('');
+    const wri = wriQs(s).map((q, i) => `<tr><td>${esc(q)}</td><td>${(s.writingMarks && s.writingMarks[i] !== null && s.writingMarks[i] !== undefined) ? s.writingMarks[i] + ' / ' + WRITING_MAX_MARKS : 'not marked'}</td></tr>`).join('');
+    const school = document.getElementById('school-name').innerText;
+    return `<div class="print-card">
+      <h1>${esc(school)}</h1>
+      <h2>A2 English Assessment - Report Card</h2>
+      <p><strong>Name:</strong> ${esc(s.name)} &nbsp; <strong>Class:</strong> ${esc(s.class)} &nbsp; <strong>Roll no.:</strong> ${esc(s.roll)} &nbsp; <strong>Date:</strong> ${esc(s.timestamp)}</p>
+      <table><thead><tr><th>Skill</th><th>Marks</th><th>Out of</th><th>Percent</th></tr></thead><tbody>
+        ${row('Listening', s.listeningScore, lisN(s), p.lis)}
+        ${row('Speaking', speakingTotal(s), spkQs(s).length, p.spk)}
+        ${row('Reading', s.readingScore, readN(s), p.read)}
+        ${row('Writing', writingGraded(s) ? writingTotal(s) : 'not marked', wMax, p.wri)}
+      </tbody></table>
+      <p><strong>Overall:</strong> ${overallPercent(s)}%${p.wri === null ? ' (writing not marked yet)' : ''}</p>
+      <h3>Speaking</h3><table><thead><tr><th>Question</th><th>Mark</th><th>Feedback</th></tr></thead><tbody>${spk}</tbody></table>
+      <h3>Writing</h3><table><thead><tr><th>Prompt</th><th>Marks</th></tr></thead><tbody>${wri}</tbody></table>
+      ${s.teacherComment ? `<h3>Teacher's comment</h3><p>${esc(s.teacherComment)}</p>` : ''}
+    </div>`;
+  }
+
+  function printReports(subs) {
+    if (!subs.length) { alert('Nothing to print.'); return; }
+    const area = document.getElementById('print-area');
+    area.innerHTML = subs.map(reportCardHtml).join('');
+    setTimeout(() => { window.print(); }, 150);
+  }
+  function printStudent(idx) { const s = getSubmissionDatabase()[idx]; if (s) printReports([s]); }
+  function printShown() { printReports(latestEntries(filteredEntries().entries).map(e => e.sub)); }
+  window.addEventListener('afterprint', () => { const a = document.getElementById('print-area'); if (a) a.innerHTML = ''; });
+
+  function renderStudentScript() {
+    const select = document.getElementById('submission-select');
+    const idx = select.value;
+    const db = getSubmissionDatabase();
+
+    if (idx === '' || !db[idx]) return;
+
+    const sub = db[idx];
+    const results = sub.speakingResults || [];
+
+    document.getElementById('teacher-student-meta').innerHTML = `
+      <h3>Answer Script Details for ${esc(sub.name)}</h3>
+      <p><strong>Class:</strong> ${esc(sub.class)} | <strong>Roll No:</strong> ${esc(sub.roll)} | <strong>Submitted:</strong> ${esc(sub.timestamp)}</p>
+      <p><strong>Listening Score:</strong> ${sub.listeningScore}/${lisN(sub)} | <strong>Reading Score:</strong> ${sub.readingScore}/${readN(sub)} | <strong>Speaking so far:</strong> ${speakingTotal(sub)}/${spkQs(sub).length}</p>
+    `;
+
+    document.getElementById('teacher-speaking-reviews').innerHTML = spkQs(sub).map((prompt, i) => {
+      const r = results[i];
+      const ov = r && r.override !== null && r.override !== undefined ? String(r.override) : '';
+      const aiMark = r && r.score !== null && r.score !== undefined ? r.score : 'not marked';
+      const method = r ? (r.method === 'rules' ? 'automatic' : 'pending') : '';
+      return `
+      <div class="question-block">
+        <p class="question-title">Q${i + 1}: ${esc(prompt)}</p>
+        ${r ? `<audio id="aud-${i}" controls></audio>` : `<p style="color: var(--danger); font-size: 0.85rem;">No recording submitted.</p>`}
+        ${r ? `
+        <label class="small-note" for="tr-${i}">What the computer heard (you can correct it, then press Re-score):</label>
+        <textarea id="tr-${i}" style="min-height: 60px;">${esc(r.transcript || '')}</textarea>
+        <div class="ai-box">Mark (${method}): <strong>${aiMark}</strong> / 1 &nbsp;|&nbsp; ${esc(r.feedback || '')}</div>
+        <label class="small-note" for="ov-${i}">Your mark:</label>
+        <select id="ov-${i}">
+          <option value="" ${ov === '' ? 'selected' : ''}>Keep the mark above</option>
+          <option value="0" ${ov === '0' ? 'selected' : ''}>0</option>
+          <option value="0.5" ${ov === '0.5' ? 'selected' : ''}>0.5</option>
+          <option value="1" ${ov === '1' ? 'selected' : ''}>1</option>
+        </select>
+        <button class="btn btn-grey" style="padding: 4px 10px; font-size: 0.8rem;" onclick="rescoreSpeaking(${i})">Re-score from text</button>
+        ` : ''}
+      </div>`;
+    }).join('');
+
+    // load audio from IndexedDB
+    spkQs(sub).forEach((_, i) => {
+      if (!results[i]) return;
+      loadClip(sub.id + '_' + i).then(blob => {
+        const el = document.getElementById('aud-' + i);
+        if (!el) return;
+        if (blob) el.src = URL.createObjectURL(blob);
+        else el.insertAdjacentHTML('afterend', '<p style="color: var(--danger); font-size: 0.85rem;">Audio file not found on this computer.</p>');
+      });
+    });
+
+    document.getElementById('teacher-writing-reviews').innerHTML = wriQs(sub).map((prompt, i) => {
+      const m = sub.writingMarks && sub.writingMarks[i] !== null && sub.writingMarks[i] !== undefined ? sub.writingMarks[i] : '';
+      return `
+      <div class="question-block">
+        <p class="question-title">${esc(prompt)}</p>
+        <textarea readonly style="background: #f1f5f9;">${esc(sub.writingResponses[i] || '[Blank Response]')}</textarea>
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 4px;">Word Count: ${sub.writingWordCounts[i] || 0}</p>
+        <div class="form-group" style="margin-top: 8px;">
+          <label for="wm-${i}">Marks (0 to ${WRITING_MAX_MARKS}):</label>
+          <input type="number" id="wm-${i}" min="0" max="${WRITING_MAX_MARKS}" step="0.5" value="${m}">
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  async function rescoreSpeaking(i) {
+    const select = document.getElementById('submission-select');
+    const db = getSubmissionDatabase();
+    const sub = db[select.value];
+    if (!sub) return;
+    const text = document.getElementById('tr-' + i).value;
+    const r = await scoreSpeakingAnswer(i, text);
+    const old = (sub.speakingResults || [])[i] || {};
+    sub.speakingResults[i] = { transcript: text, score: r.score, feedback: r.feedback, method: r.method, override: old.override === undefined ? null : old.override };
+    try { localStorage.setItem(DB_STORAGE_KEY, JSON.stringify(db)); } catch (e) {}
+    const keep = select.value;
+    loadSelectedStudentScript();
+    select.value = keep;
+  }
+
+  function saveTeacherEvaluation() {
+    const select = document.getElementById('submission-select');
+    const idx = select.value;
+    const db = getSubmissionDatabase();
+
+    if (idx === '' || !db[idx]) {
+      alert("No student script selected!");
+      return;
+    }
+
+    const sub = db[idx];
+    sub.speakingResults = sub.speakingResults || new Array(spkQs(sub).length).fill(null);
+    for (let i = 0; i < spkQs(sub).length; i++) {
+      const r = sub.speakingResults[i];
+      if (!r) continue;
+      const ovEl = document.getElementById('ov-' + i);
+      const trEl = document.getElementById('tr-' + i);
+      if (trEl) r.transcript = trEl.value;
+      if (ovEl) r.override = ovEl.value === '' ? null : Number(ovEl.value);
+    }
+    sub.writingMarks = wriQs(sub).map((_, i) => {
+      const el = document.getElementById('wm-' + i);
+      if (!el || el.value === '') return null;
+      return Math.max(0, Math.min(WRITING_MAX_MARKS, Number(el.value)));
+    });
+    sub.teacherComment = (document.getElementById('teacher-comment').value || '').trim().slice(0, 400);
+    sub.isGraded = true;
+
+    db[idx] = sub;
+    try {
+      localStorage.setItem(DB_STORAGE_KEY, JSON.stringify(db));
+    } catch (e) {}
+
+    const left = db.filter(needsMarking).length;
+    const msg = `Saved. ${left} ${left === 1 ? 'student is' : 'students are'} still waiting for marks.`;
+    populateTeacherDropdown();
+    document.getElementById('submission-select').value = String(idx);
+    loadSelectedStudentScript();
+    const st = document.getElementById('save-status');
+    st.style.color = 'var(--success)';
+    st.innerText = msg;
+  }
+  refreshCountsText();
+</script>
+
+
+<div class="modal-back" id="start-confirm" role="dialog" aria-modal="true">
+  <div class="modal-box">
+    <h3>This is a timed test</h3>
+    <p>The timer starts as soon as you begin and cannot be paused.</p>
+    <ul id="start-confirm-times"></ul>
+    <p><strong>Are you ready to start?</strong></p>
+    <button class="btn" onclick="confirmStartTest()">Yes, start the test</button>
+    <button class="btn btn-grey" onclick="closeStartConfirm()">Not yet</button>
+  </div>
+</div>
+
+<div id="print-area"></div>
+
+</body>
+</html>

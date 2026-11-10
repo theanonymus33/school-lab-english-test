@@ -1,5 +1,3 @@
-[README.md](https://github.com/user-attachments/files/34631179/README.md)
-
 # A2 English Assessment (free, offline, single file)
 
 A free listening, speaking, reading and writing test for school computer labs.
